@@ -1,5 +1,5 @@
-IF						!DEF(__MEMORY_INC_DEF__)
-__FUNCTIONS_INC_DEF__	SET 1
+IF	!DEF(__MEMORY_INC_DEF__)
+__MEMORY_INC_DEF__	SET 1
 
 
 SECTION "memory",	CODE
@@ -35,5 +35,5 @@ mem_fill:
 	jr		mem_fill
 
 
-ENDC    				; __MEMORY_INC_DEF__
+ENDC	; __MEMORY_INC_DEF__
 

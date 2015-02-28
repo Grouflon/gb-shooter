@@ -1,5 +1,6 @@
 INCLUDE "gbhw.inc"
 INCLUDE "memory.inc"
+INCLUDE "input.inc"
 
 
 ; Entry point
@@ -8,7 +9,7 @@ main:
     nop
 	jp initialize
 
-	ROM_HEADER	ROM_NOMBC,	ROM_SIZE_32KBYTE,	RAM_SIZE_0KBYTE
+	ROM_HEADER	ROM_NOMBC, ROM_SIZE_32KBYTE, RAM_SIZE_0KBYTE
 
 initialize:
 	di
