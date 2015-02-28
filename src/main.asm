@@ -2,10 +2,16 @@ INCLUDE "gbhw.inc"
 INCLUDE "memory.inc"
 INCLUDE "input.inc"
 INCLUDE "display.inc"
+INCLUDE "string.inc"
+
+
+SECTION "text",	CODE
+string:
+	DB "Hello World 123!",0
 
 
 ; Entry point
-SECTION "main"  , HOME[$0100]
+SECTION "main",	HOME[$0100]
 main:
     nop
 	jp initialize
@@ -42,9 +48,20 @@ initialize:
 	ld		l,		0
 	call	mem_fill
 
+	call	initialize_str
+
+	ld		b,		2
+	ld		c,		2
+	ld		hl,		string
+	call	print_str
+
 	; Set LCD
-	ld	a,	LCDCF_ON|LCDCF_BG8000|LCDCF_BG9800|LCDCF_OBJ8|LCDCF_BGON|LCDCF_WINOFF|LCDCF_OBJOFF
+	ld	a,			LCDCF_ON|LCDCF_BG8800|LCDCF_BG9800|LCDCF_OBJ8|LCDCF_BGON
+	ld	[rLCDC],	a
 
 loop:
 	nop
 	jp	loop
+
+
+

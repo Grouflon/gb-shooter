@@ -43,7 +43,7 @@ fclean: clean
 
 re : fclean all
 
-upload: $(TARGET)
+upload: $(BIN_DIR)$(TARGET)
 	sudo ~/ems-flasher/ems-flasher --write $(BIN_DIR)$(TARGET)
 
 $(BIN_DIR):
