@@ -36,4 +36,3 @@ mem_fill:
 
 
 ENDC	; __MEMORY_INC_DEF__
-
