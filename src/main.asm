@@ -1,7 +1,19 @@
 INCLUDE "gbhw.inc"
+INCLUDE "memory.inc"
 
-; Start
-SECTION "main"  , CODE
+
+; Entry point
+SECTION "main"  , HOME[$0100]
 main:
     nop
-    ld      sp      , $ffff
+	jp initialize
+
+	ROM_HEADER	ROM_NOMBC,	ROM_SIZE_32KBYTE,	RAM_SIZE_0KBYTE
+
+initialize:
+	di
+    ld	sp      , $ffff
+
+loop:
+	nop
+	jp	loop
