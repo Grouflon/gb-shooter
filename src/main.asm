@@ -1,26 +1,26 @@
 INCLUDE "gbhw.inc"
 INCLUDE "memory.inc"
-INCLUDE "input.inc"
 INCLUDE "display.inc"
 INCLUDE "string.inc"
 
-PAD		EQU	_RAM
-
-SPR_Y	EQU _OAMRAM
-SPR_X	EQU _OAMRAM+1
-SPR_NUM	EQU _OAMRAM+2
-SPR_ATT	EQU _OAMRAM+3
+INCLUDE "player.inc"
 
 
-SECTION "text",	CODE
+PLAYER_SPR	EQU _OAMRAM
+
+
+SECTION "text",	DATA
 string:
 	DB "Hello World 123!",0
 
 
-SECTION "sprites",	CODE
+SECTION "sprites",	DATA
 sprites:
 INCLUDE "sprites.asm"
 sprites_end:
+
+
+SECTION	"main_vars",	BSS
 
 
 ; Entry point
@@ -69,14 +69,8 @@ initialize:
 	ld		hl,		sprites
 	call	mem_copy
 
-	ld		a,			40
-	ld		[SPR_X],	a
-	ld		[SPR_Y],	a
-	ld		a,			0
-	ld		[SPR_NUM],	a
-	ld		a,			OAMF_PAL0
-	ld		[SPR_ATT],	a
-	
+	ld		a,		0
+	call	player_init
 
 	call	initialize_str
 
@@ -90,83 +84,8 @@ initialize:
 	ld	[rLCDC],	a
 
 loop:
-	call	read_input
-	ld		[PAD],	a
-
-	ld		a,	[PAD]
-	and		PADF_LEFT
-	call	nz,		move_left
-
-	ld		a,	[PAD]
-	and		PADF_RIGHT
-	call	nz,		move_right
-
-	ld		a,	[PAD]
-	and		PADF_UP
-	call	nz,		move_up
-
-	ld		a,	[PAD]
-	and		PADF_DOWN
-	call	nz,		move_down
+	call	player_update
 
 	call	wait_vblank
 	jp		loop
-
-
-move_left:
-	ld		a,	[SPR_X]
-	cp		8
-	ret		z
-	dec		a
-	ld		[SPR_X],	a
-
-	ld		a,			[SPR_ATT]
-	set		5,			a
-	ld		[SPR_ATT],	a
-	ld		a,			0
-	ld		[SPR_NUM],	a
-	ret
-
-move_right:
-	ld		a,	[SPR_X]
-	cp		160
-	ret		z
-	inc		a
-	ld		[SPR_X],	a
-
-	ld		a,			[SPR_ATT]
-	res		5,			a
-	ld		[SPR_ATT],	a
-	ld		a,			0
-	ld		[SPR_NUM],	a
-	ret
-
-move_up:
-	ld		a,	[SPR_Y]
-	cp		16
-	ret		z
-	dec		a
-	ld		[SPR_Y],	a
-
-	ld		a,			[SPR_ATT]
-	res		6,			a
-	ld		[SPR_ATT],	a
-	ld		a,			1
-	ld		[SPR_NUM],	a
-	ret
-
-move_down:
-	ld		a,	[SPR_Y]
-	cp		152
-	ret		z
-	inc		a
-	ld		[SPR_Y],	a
-
-	ld		a,			[SPR_ATT]
-	set		6,			a
-	ld		[SPR_ATT],	a
-	ld		a,			1
-	ld		[SPR_NUM],	a
-	ret
-
 

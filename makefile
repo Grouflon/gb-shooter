@@ -41,7 +41,7 @@ clean:
 fclean: clean
 	rm -f $(BIN_DIR)$(TARGET)
 
-re : fclean all
+re : fclean run
 
 upload: $(BIN_DIR)$(TARGET)
 	sudo ~/ems-flasher/ems-flasher --write $(BIN_DIR)$(TARGET)
