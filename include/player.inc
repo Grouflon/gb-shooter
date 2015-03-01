@@ -42,7 +42,6 @@ player_init:
 	ld		[P_Y],		a
 	ld		a,			P_FACING_LEFT
 	ld		[P_FACING],	a
-	call	player_draw
 
 .init_bullets
 	ld		hl,		P_BULLETS
@@ -173,25 +172,25 @@ player_draw_bullets:
 
 
 player_update:
-	call	read_input
-	push	af
-	
+	ld		a,	[INPUT]
 	and		PADF_RIGHT
 	call	nz,	player_move_right
 	
-	pop		af
-	push	af
+	ld		a,	[INPUT]
 	and		PADF_LEFT
 	call	nz,	player_move_left
 
-	pop		af
-	push	af
+	ld		a,	[INPUT]
 	and		PADF_UP
 	call	nz,	player_move_up
 
-	pop		af
+	ld		a,	[INPUT]
 	and		PADF_DOWN
 	call	nz,	player_move_down
+
+	ld		a,	[INPUT_PRESSED]
+	and		PADF_B
+	call	nz,	player_fire_bullet
 
 	call	player_update_bullets
 	ret
@@ -264,6 +263,54 @@ player_move_down:
 	ld		[P_Y],		a
 	ld		a,			P_FACING_DOWN
 	ld		[P_FACING],	a
+	ret
+
+
+player_fire_bullet:
+	ld		hl,		P_BULLETS
+	ld		a,		P_BULLET_COUNT
+	ld		de,		B_SIZEOF
+.p_bullet_fire_loop
+	cp		0
+	jr		z,	.p_bullet_fire_end
+	push	af
+	push	de
+	push	hl
+
+	call	bullet_is_enabled
+	cp		0
+	jr		nz,	.p_bullet_fire_continue
+
+	pop		hl
+	push	hl
+	ld		a,	[P_X]
+	ld		b,	a
+	ld		a,	[P_Y]
+	call	bullet_set_position
+
+	pop		hl
+	push	hl
+	ld		a,	[P_FACING]
+	call	bullet_set_facing
+
+	pop		hl
+	push	hl
+	ld		a,	1
+	call	bullet_set_enabled
+
+	pop		hl
+	pop		de
+	pop		af
+	jr		.p_bullet_fire_end
+
+.p_bullet_fire_continue
+	pop		hl
+	pop		de
+	pop		af
+	dec		a
+	add		hl,		de
+	jr		.p_bullet_fire_loop
+.p_bullet_fire_end
 	ret
 
 

@@ -4,6 +4,7 @@ INCLUDE "memory.inc"
 INCLUDE "time.inc"
 INCLUDE "display.inc"
 INCLUDE "string.inc"
+INCLUDE "input.inc"
 INCLUDE "player.inc"
 
 
@@ -24,7 +25,6 @@ SECTION	"main_vars",	BSS
 
 
 SECTION "vblank_interrupt",           HOME[$0040]
-    ;call    player_draw
 	call	dma
     reti
 
@@ -97,9 +97,9 @@ initialize:
 
 
 loop:
+	call	update_input
 	call	player_update
 	call	player_draw
 
 	halt
-;	call	wait_vblank
 	jp		loop
