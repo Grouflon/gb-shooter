@@ -2,6 +2,7 @@ IF  !DEF(__PLAYER_INC_DEF__)
 __PLAYER_INC_DEF__ SET 1
 
 INCLUDE "gbhw.inc"
+INCLUDE "dma.inc"
 INCLUDE "input.inc"
 INCLUDE "memory.inc"
 INCLUDE "bullet.inc"
@@ -15,7 +16,7 @@ P_FACING_DOWN	EQU	%00001000
 P_H_SPRITE		EQU 0
 P_V_SPRITE		EQU 1
 
-P_BULLET_COUNT	EQU	10
+P_BULLET_COUNT	EQU	15
 
 SECTION "player_vars",	BSS
 P_SPR:		DS 1
@@ -64,7 +65,7 @@ player_init:
 	pop		de
 
 	ld		a,	c
-	add		a, 	40
+	add		a, 	10
 	ld		c,	a
 
 	pop		af
@@ -89,7 +90,9 @@ player_init:
 
 
 player_draw:
-	ld		hl,	_OAMRAM
+	call	player_draw_bullets
+
+	ld		hl,	OAM_BUFFER
 	ld		bc,	4
 	ld		a,	[P_SPR]
 	call	find_address
@@ -144,7 +147,10 @@ player_draw:
 	ld	a,	b
 	ld	[hl],	a
 
-.p_draw_bullets
+	ret
+
+
+player_draw_bullets:
 	ld		hl,	P_BULLETS
 	ld		de,	B_SIZEOF
 	ld		a,	P_BULLET_COUNT

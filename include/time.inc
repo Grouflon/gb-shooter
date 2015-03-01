@@ -3,6 +3,9 @@ __TIME_INC_DEF__	SET 1
 
 INCLUDE "gbhw.inc"
 
+
+SECTION "time", CODE
+
 ; Wait for the next vertical blank frame
 wait_vblank:
 .wait_vblank_start:

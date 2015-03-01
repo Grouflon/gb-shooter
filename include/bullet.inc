@@ -2,6 +2,7 @@ IF  !DEF(__BULLET_INC_DEF__)
 __BULLET_INC_DEF__ SET 1
 
 INCLUDE "gbhw.inc"
+INCLUDE "dma.inc"
 INCLUDE "memory.inc"
 
 B_FACING_LEFT	EQU	%00000001
@@ -110,7 +111,7 @@ bullet_update:
 bullet_draw:
 	push	hl
 	pop		de
-	ld		hl,		_OAMRAM
+	ld		hl,		OAM_BUFFER
 	ld		bc,		4
 	ld		a,		[de]
 	call	find_address

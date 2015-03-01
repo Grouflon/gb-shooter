@@ -1,4 +1,5 @@
 INCLUDE "gbhw.inc"
+INCLUDE "dma.inc"
 INCLUDE "memory.inc"
 INCLUDE "time.inc"
 INCLUDE "display.inc"
@@ -23,7 +24,8 @@ SECTION	"main_vars",	BSS
 
 
 SECTION "vblank_interrupt",           HOME[$0040]
-    call    player_draw
+    ;call    player_draw
+	call	dma
     reti
 
 ; Entry point
@@ -38,6 +40,8 @@ initialize:
 	di
     ld	sp,	$ffff
 
+	; copy dma buffer transfer routine
+	call	copy_dma_code
 
 	; Init Palettes
 	ld	a,			%11100100
@@ -61,7 +65,7 @@ initialize:
 	call	mem_fill
 
 	; Empty sprites
-	ld		de,		_OAMRAM
+	ld		de,		OAM_BUFFER
 	ld		bc,		40*4
 	ld		l,		0
 	call	mem_fill
@@ -91,10 +95,11 @@ initialize:
 	ld	[rIE],	a
 	ei
 
+
 loop:
 	call	player_update
+	call	player_draw
 
 	halt
 ;	call	wait_vblank
 	jp		loop
-
