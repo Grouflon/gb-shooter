@@ -2,12 +2,10 @@ INCLUDE "gbhw.inc"
 INCLUDE "memory.inc"
 INCLUDE "display.inc"
 INCLUDE "string.inc"
-
 INCLUDE "player.inc"
 
 
 PLAYER_SPR	EQU _OAMRAM
-
 
 SECTION "text",	DATA
 string:

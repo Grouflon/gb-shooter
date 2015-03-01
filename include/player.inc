@@ -3,46 +3,74 @@ __PLAYER_INC_DEF__ SET 1
 
 INCLUDE "gbhw.inc"
 INCLUDE "input.inc"
+INCLUDE "memory.inc"
+INCLUDE "bullet.inc"
 
-P_FACING_LEFT	EQU	0
-P_FACING_RIGHT	EQU	1
-P_FACING_UP		EQU	2
-P_FACING_DOWN	EQU	3
+
+P_FACING_LEFT	EQU	%00000001
+P_FACING_RIGHT	EQU	%00000010
+P_FACING_UP		EQU	%00000100
+P_FACING_DOWN	EQU	%00001000
 
 P_H_SPRITE		EQU 0
 P_V_SPRITE		EQU 1
+
+P_BULLET_COUNT	EQU	2
 
 SECTION "player_vars",	BSS
 P_SPR:		DS 1
 P_X:		DS 1
 P_Y:		DS 1
 P_FACING:	DS 1
+P_BULLETS:
+REPT P_BULLET_COUNT		
+DS B_SIZEOF
+ENDR
+
 
 
 SECTION "player", CODE
+
+
 ; a		- Player sprite number
 player_init:
+.init_player
 	ld		[P_SPR],	a
 	ld		a,			40
 	ld		[P_X],		a
 	ld		[P_Y],		a
 	ld		a,			P_FACING_LEFT
 	ld		[P_FACING],	a
-
 	call	player_update_sprite
+
+.init_bullets
+	ld		hl,		P_BULLETS
+	ld		de,		B_SIZEOF
+	ld		a,		[P_SPR]
+	ld		b,		a
+	inc		b
+	ld		a,		P_BULLET_COUNT
+.bullet_loop_start
+	cp		0
+	jr		z,		.init_player_end
+	push	af
+	call	bullet_init
+	pop		af
+	inc		b
+	add		hl,		de
+	dec		a
+	jr		.bullet_loop_start
+
+.init_player_end
 	ret
 
-player_update_sprite:
-	ld	hl,	_OAMRAM
-	ld	bc,	4
-	ld	a,	[P_SPR]
 
-.find_sprite
-	cp	0
-	jr	z,	.update_sprite
-	add	hl,	bc
-	dec	a
-	jr	.find_sprite
+
+player_update_sprite:
+	ld		hl,	_OAMRAM
+	ld		bc,	4
+	ld		a,	[P_SPR]
+	call	find_address
 
 .update_sprite
 	; Y
@@ -96,6 +124,7 @@ player_update_sprite:
 	ret
 
 
+
 player_update:
 	call	read_input
 	push	af
@@ -121,6 +150,7 @@ player_update:
 	ret
 
 
+
 player_move_right:
 	ld		a,			[P_X]
 	inc		a
@@ -130,6 +160,7 @@ player_move_right:
 	ld		a,			P_FACING_RIGHT
 	ld		[P_FACING],	a
 	ret
+
 
 
 player_move_left:
@@ -143,6 +174,7 @@ player_move_left:
 	ret
 
 
+
 player_move_up:
 	ld		a,			[P_Y]
 	cp		16
@@ -154,6 +186,7 @@ player_move_up:
 	ret
 
 	
+
 player_move_down:
 	ld		a,			[P_Y]
 	cp		152
@@ -163,6 +196,7 @@ player_move_down:
 	ld		a,			P_FACING_DOWN
 	ld		[P_FACING],	a
 	ret
+
 
 	
 ENDC    ; __PLAYER_INC_DEF__

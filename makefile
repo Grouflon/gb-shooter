@@ -27,12 +27,13 @@ fix:
 	rgbfix -p0 -v $(BIN_DIR)$(TARGET)
 
 write_linkfile:
-	echo "[Objects]\n" > $(OBJ_DIR)$(LINKFILE)
-	echo $(OBJ) >> $(OBJ_DIR)$(LINKFILE)
-	echo "[Output]\n" >> $(OBJ_DIR)$(LINKFILE)
-	echo $(BIN_DIR)$(TARGET) >> $(OBJ_DIR)$(LINKFILE)
+	@echo "Writing linkfile..."
+	@echo "[Objects]\n" > $(OBJ_DIR)$(LINKFILE)
+	@echo $(OBJ) >> $(OBJ_DIR)$(LINKFILE)
+	@echo "[Output]\n" >> $(OBJ_DIR)$(LINKFILE)
+	@echo $(BIN_DIR)$(TARGET) >> $(OBJ_DIR)$(LINKFILE)
 
-run: all
+run: re
 	wine ~/bgb/bgb.exe $(BIN_DIR)$(TARGET)
 
 clean:
@@ -41,13 +42,13 @@ clean:
 fclean: clean
 	rm -f $(BIN_DIR)$(TARGET)
 
-re : fclean run
+re : fclean all
 
 upload: $(BIN_DIR)$(TARGET)
 	sudo ~/ems-flasher/ems-flasher --write $(BIN_DIR)$(TARGET)
 
 $(BIN_DIR):
-	mkdir -p $@
+	@mkdir -p $@
 
 $(OBJ_DIR):
-	mkdir -p $@
+	@mkdir -p $@

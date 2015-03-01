@@ -35,4 +35,21 @@ mem_fill:
 	jr		mem_fill
 
 
+; Finds the adress corresponding to the nth element of an array of structures
+; hl	-	start of array's address
+; bc	-	structure size
+; a		-	searched index
+;
+; ret hl	-	return address
+find_address:
+.find_address_loop
+	cp		0
+	jr		z,		.find_address_end
+	add		hl,		bc
+	dec		a
+	jr		.find_address_loop
+.find_address_end
+	ret
+
+
 ENDC	; __MEMORY_INC_DEF__
