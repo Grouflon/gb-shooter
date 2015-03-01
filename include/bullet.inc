@@ -13,6 +13,7 @@ B_FACING_DOWN	EQU	%00001000
 B_SPRITE		EQU 2
 
 			RSRESET
+B_ENABLED	RB 1
 B_SPR		RB 1
 B_Y			RB 1
 B_X			RB 1
@@ -29,7 +30,11 @@ SECTION "bullet", CODE
 ; b		- Sprite index
 bullet_init:
 	push	hl
+.b_enabled
+	ld		a,		1
+	ld		[hl],	a
 .b_sprite_index
+	inc		hl
 	ld		a,		b
 	ld		[hl],	a
 .b_coords
@@ -53,6 +58,7 @@ bullet_init:
 ; b		- x
 bullet_set_position:
 	inc		hl
+	inc		hl
 	ld		[hl],	a
 	inc		hl
 	ld		a,		b
@@ -63,6 +69,7 @@ bullet_set_position:
 ; hl	- Bullet struct address
 bullet_update:
 	push	hl
+	inc		hl
 	inc		hl
 	ld		a,	[hl]
 	ld		b,	a
@@ -95,6 +102,7 @@ bullet_update:
 	pop		hl
 	push	hl
 	inc		hl
+	inc		hl
 	ld		a,		b
 	ld		[hl],	a
 	inc		hl
@@ -111,6 +119,7 @@ bullet_update:
 bullet_draw:
 	push	hl
 	pop		de
+	inc		de
 	ld		hl,		OAM_BUFFER
 	ld		bc,		4
 	ld		a,		[de]
