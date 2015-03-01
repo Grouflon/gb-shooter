@@ -43,18 +43,71 @@ bullet_init:
 	ld		[hl],	a
 .b_init_end
 	pop		hl
-	call	bullet_update_sprite
+	call	bullet_draw
+	ret
+
+
+; hl	- Bullet struct address
+; a		- y
+; b		- x
+bullet_set_position:
+	inc		hl
+	ld		[hl],	a
+	inc		hl
+	ld		a,		b
+	ld		[hl],	a
 	ret
 
 
 ; hl	- Bullet struct address
 bullet_update:
+	push	hl
+	inc		hl
+	ld		a,	[hl]
+	ld		b,	a
+	inc		hl
+	ld		a,	[hl]
+	ld		c,	a
+	inc		hl
+	ld		a,	[hl]
+	cp		B_FACING_LEFT
+	jr		z,	.b_move_left
+	cp		B_FACING_RIGHT
+	jr		z,	.b_move_left
+	cp		B_FACING_UP
+	jr		z,	.b_move_up
+	cp		B_FACING_DOWN
+	jr		z,	.b_move_down
+.b_move_left
+	dec		c
+	jr		.b_apply_movement
+.b_move_right
+	inc		c
+	jr		.b_apply_movement
+.b_move_up
+	dec		b
+	jr		.b_apply_movement
+.b_move_down
+	inc		b
+
+.b_apply_movement	
+	pop		hl
+	push	hl
+	inc		hl
+	ld		a,		b
+	ld		[hl],	a
+	inc		hl
+	ld		a,		c
+	ld		[hl],	a
+
+	pop		hl
+
 	ret
 
 
 
 ; hl	- Bullet struct address
-bullet_update_sprite:
+bullet_draw:
 	push	hl
 	pop		de
 	ld		hl,		_OAMRAM

@@ -1,11 +1,12 @@
 INCLUDE "gbhw.inc"
 INCLUDE "memory.inc"
+INCLUDE "time.inc"
 INCLUDE "display.inc"
 INCLUDE "string.inc"
 INCLUDE "player.inc"
 
 
-PLAYER_SPR	EQU _OAMRAM
+PLAYER_SPR	EQU 0
 
 SECTION "text",	DATA
 string:
@@ -20,6 +21,10 @@ sprites_end:
 
 SECTION	"main_vars",	BSS
 
+
+SECTION "vblank_interrupt",           HOME[$0040]
+    call    player_draw
+    reti
 
 ; Entry point
 SECTION "main",	HOME[$0100]
@@ -67,7 +72,7 @@ initialize:
 	ld		hl,		sprites
 	call	mem_copy
 
-	ld		a,		0
+	ld		a,		PLAYER_SPR
 	call	player_init
 
 	call	initialize_str
@@ -81,9 +86,15 @@ initialize:
 	ld	a,			LCDCF_ON|LCDCF_BG8800|LCDCF_BG9800|LCDCF_OBJ8|LCDCF_BGON|LCDCF_OBJON
 	ld	[rLCDC],	a
 
+	; Enable interrupts
+	ld	a,		IEF_VBLANK
+	ld	[rIE],	a
+	ei
+
 loop:
 	call	player_update
 
-	call	wait_vblank
+	halt
+;	call	wait_vblank
 	jp		loop
 

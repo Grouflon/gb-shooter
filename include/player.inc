@@ -15,7 +15,7 @@ P_FACING_DOWN	EQU	%00001000
 P_H_SPRITE		EQU 0
 P_V_SPRITE		EQU 1
 
-P_BULLET_COUNT	EQU	5
+P_BULLET_COUNT	EQU	10
 
 SECTION "player_vars",	BSS
 P_SPR:		DS 1
@@ -41,12 +41,13 @@ player_init:
 	ld		[P_Y],		a
 	ld		a,			P_FACING_LEFT
 	ld		[P_FACING],	a
-	call	player_update_sprite
+	call	player_draw
 
 .init_bullets
 	ld		hl,		P_BULLETS
 	ld		de,		B_SIZEOF
 	ld		a,		[P_SPR]
+	ld		c,		0
 	ld		b,		a
 	inc		b
 	ld		a,		P_BULLET_COUNT
@@ -61,7 +62,22 @@ player_init:
 	pop		hl
 	pop		bc
 	pop		de
+
+	ld		a,	c
+	add		a, 	40
+	ld		c,	a
+
 	pop		af
+	push	bc
+	push	hl
+	push	af
+	ld		a,	c
+	ld		b,	a
+	call	bullet_set_position
+	pop		af
+	pop		hl
+	pop		bc
+
 	inc		b
 	add		hl,		de
 	dec		a
@@ -72,7 +88,7 @@ player_init:
 
 
 
-player_update_sprite:
+player_draw:
 	ld		hl,	_OAMRAM
 	ld		bc,	4
 	ld		a,	[P_SPR]
@@ -120,13 +136,32 @@ player_update_sprite:
 .attr_vertical
 	ld	a,	c
 	cp	P_FACING_UP
-	jr	z,	.end
+	jr	z,	.attr_end
 	ld	a,	b
 	or OAMF_YFLIP
 	ld	b,	a
-.end
+.attr_end
 	ld	a,	b
 	ld	[hl],	a
+
+.p_draw_bullets
+	ld		hl,	P_BULLETS
+	ld		de,	B_SIZEOF
+	ld		a,	P_BULLET_COUNT
+.p_draw_bullets_loop
+	cp		0
+	jr		z,	.p_draw_bullets_end
+	push	hl
+	push	de
+	push	af
+	call	bullet_draw
+	pop		af
+	pop		de
+	pop		hl
+	add		hl,	de
+	dec		a
+	jr		.p_draw_bullets_loop
+.p_draw_bullets_end	
 	ret
 
 
@@ -153,7 +188,6 @@ player_update:
 	call	nz,	player_move_down
 
 	call	player_update_bullets
-	call	player_update_sprite
 	ret
 
 
@@ -167,7 +201,9 @@ player_update_bullets:
 	jr		z,	.p_bullet_update_end
 	push	af
 	push	de
+	push	hl
 	call	bullet_update
+	pop		hl
 	pop		de
 	pop		af
 	dec		a

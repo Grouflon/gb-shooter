@@ -2,18 +2,9 @@ IF	!DEF(__DISPLAY_INC_DEF__)
 __DISPLAY_INC_DEF__	SET 1
 
 INCLUDE "gbhw.inc"
-
+INCLUDE "time.inc"
 
 SECTION "display",	CODE
-
-; Wait for the next vertical blank time frame
-wait_vblank:
-.wait_vblank_start:
-	ld	a,	[rLY]
-	cp	145
-	jr	nz,	.wait_vblank_start	; loop here while not in vertical blank
-	ret
-
 
 ; Wait for the next vertical blank, then disable LCD
 disable_lcd:
