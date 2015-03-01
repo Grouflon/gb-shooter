@@ -15,7 +15,7 @@ P_FACING_DOWN	EQU	%00001000
 P_H_SPRITE		EQU 0
 P_V_SPRITE		EQU 1
 
-P_BULLET_COUNT	EQU	2
+P_BULLET_COUNT	EQU	5
 
 SECTION "player_vars",	BSS
 P_SPR:		DS 1
@@ -54,7 +54,13 @@ player_init:
 	cp		0
 	jr		z,		.init_player_end
 	push	af
+	push	de
+	push	bc
+	push	hl
 	call	bullet_init
+	pop		hl
+	pop		bc
+	pop		de
 	pop		af
 	inc		b
 	add		hl,		de
@@ -146,7 +152,28 @@ player_update:
 	and		PADF_DOWN
 	call	nz,	player_move_down
 
+	call	player_update_bullets
 	call	player_update_sprite
+	ret
+
+
+
+player_update_bullets:
+	ld		a,		P_BULLET_COUNT
+	ld		hl,		P_BULLETS
+	ld		de,		B_SIZEOF
+.p_bullet_update_loop
+	cp		0
+	jr		z,	.p_bullet_update_end
+	push	af
+	push	de
+	call	bullet_update
+	pop		de
+	pop		af
+	dec		a
+	add		hl,		de
+	jr		.p_bullet_update_loop
+.p_bullet_update_end
 	ret
 
 

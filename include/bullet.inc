@@ -27,6 +27,7 @@ SECTION "bullet", CODE
 ; hl	- Bullet struct address
 ; b		- Sprite index
 bullet_init:
+	push	hl
 .b_sprite_index
 	ld		a,		b
 	ld		[hl],	a
@@ -41,8 +42,15 @@ bullet_init:
 	ld		a,		B_FACING_RIGHT
 	ld		[hl],	a
 .b_init_end
+	pop		hl
 	call	bullet_update_sprite
 	ret
+
+
+; hl	- Bullet struct address
+bullet_update:
+	ret
+
 
 
 ; hl	- Bullet struct address
