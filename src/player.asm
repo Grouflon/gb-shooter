@@ -1,11 +1,11 @@
-IF  !DEF(__PLAYER_INC_DEF__)
-__PLAYER_INC_DEF__ SET 1
+IF  !DEF(__PLAYER_DEF__)
+__PLAYER_DEF__ SET 1
 
-INCLUDE "gbhw.inc"
-INCLUDE "dma.inc"
-INCLUDE "input.inc"
-INCLUDE "memory.inc"
-INCLUDE "bullet.inc"
+INCLUDE "extern/gbhw.inc"
+INCLUDE "utils/dma.asm"
+INCLUDE "utils/input.asm"
+INCLUDE "utils/memory.asm"
+INCLUDE "bullet.asm"
 
 
 P_FACING_LEFT	EQU	%00000001

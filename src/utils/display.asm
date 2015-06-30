@@ -1,8 +1,8 @@
-IF	!DEF(__DISPLAY_INC_DEF__)
-__DISPLAY_INC_DEF__	SET 1
+IF	!DEF(__DISPLAY_DEF__)
+__DISPLAY_DEF__	SET 1
 
-INCLUDE "gbhw.inc"
-INCLUDE "time.inc"
+INCLUDE "extern/gbhw.inc"
+INCLUDE "utils/time.asm"
 
 SECTION "display",	CODE
 
@@ -19,4 +19,4 @@ disable_lcd:
 	ret
 
 
-ENDC	; __DISPLAY_INC_DEF__
+ENDC	; __DISPLAY_DEF__

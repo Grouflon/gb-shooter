@@ -1,8 +1,8 @@
-IF	!DEF(__DMA_INC_DEF__)
-__DMA_INC_DEF__	SET 1
+IF	!DEF(__DMA_DEF__)
+__DMA_DEF__	SET 1
 
-INCLUDE "gbhw.inc"
-INCLUDE "memory.inc"
+INCLUDE "extern/gbhw.inc"
+INCLUDE "utils/memory.asm"
 
 
 SECTION "oam_buffer",	BSS[$C000]
@@ -37,4 +37,4 @@ copy_dma_code:
 SECTION "dma", HRAM
 dma:	DS	dma_code-dma_code_end
 
-ENDC	; __DMA_INC_DEF__
+ENDC	; __DMA_DEF__

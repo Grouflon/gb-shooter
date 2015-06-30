@@ -1,11 +1,11 @@
-INCLUDE "gbhw.inc"
-INCLUDE "dma.inc"
-INCLUDE "memory.inc"
-INCLUDE "time.inc"
-INCLUDE "display.inc"
-INCLUDE "string.inc"
-INCLUDE "input.inc"
-INCLUDE "player.inc"
+INCLUDE "extern/gbhw.inc"
+INCLUDE "utils/dma.asm"
+INCLUDE "utils/memory.asm"
+INCLUDE "utils/time.asm"
+INCLUDE "utils/display.asm"
+INCLUDE "utils/input.asm"
+INCLUDE "string.asm"
+INCLUDE "player.asm"
 
 
 PLAYER_SPR	EQU 0
@@ -17,7 +17,7 @@ string:
 
 SECTION "sprites",	DATA
 sprites:
-INCLUDE "sprites.asm"
+INCLUDE "data/sprites.asm"
 sprites_end:
 
 

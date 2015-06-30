@@ -1,7 +1,7 @@
-IF	!DEF(__INPUT_INC_DEF__)
-__INPUT_INC_DEF__	SET 1
+IF	!DEF(__INPUT_DEF__)
+__INPUT_DEF__	SET 1
 
-INCLUDE	"gbhw.inc"
+INCLUDE	"extern/gbhw.inc"
 
 
 SECTION "input_data",	BSS
@@ -63,5 +63,4 @@ init_input:
 	ld		[INPUT_PRESSED],	a
 
 
-ENDC	; __INPUT_INC_DEF__
-
+ENDC	; __INPUT_DEF__

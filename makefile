@@ -6,7 +6,7 @@ SRC = main.asm
 BIN_DIR := ./bin/
 OBJ_DIR := ./obj/
 SRC_DIR := ./src/
-INC_DIR := ./include/ ./src/ ./data/
+INC_DIR := ./src/
 
 ASM = ./tools/rgbasm
 LINK = ./tools/xlink

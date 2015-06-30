@@ -1,15 +1,15 @@
-IF	!DEF(__STRING_INC_DEF__)
-__STRING_INC_DEF__	SET 1
+IF	!DEF(__STRING_DEF__)
+__STRING_DEF__	SET 1
 
-INCLUDE "gbhw.inc"
-INCLUDE "display.inc"
-INCLUDE "memory.inc"
+INCLUDE "extern/gbhw.inc"
+INCLUDE "utils/display.asm"
+INCLUDE "utils/memory.asm"
 
 _FONT_TILES		EQU $9200
 
 SECTION "font",		CODE
 font_data:
-INCLUDE "font.asm"
+INCLUDE "data/font.asm"
 font_data_end:
 
 SECTION "string",	CODE
@@ -72,4 +72,4 @@ print_str:
 	jr		.print_char
 
 
-ENDC	; __STRING_INC_DEF__
+ENDC	; __STRING_DEF__

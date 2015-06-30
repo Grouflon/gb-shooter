@@ -1,9 +1,9 @@
-IF  !DEF(__BULLET_INC_DEF__)
-__BULLET_INC_DEF__ SET 1
+IF  !DEF(__BULLET_DEF__)
+__BULLET_DEF__ SET 1
 
-INCLUDE "gbhw.inc"
-INCLUDE "dma.inc"
-INCLUDE "memory.inc"
+INCLUDE "extern/gbhw.inc"
+INCLUDE "utils/dma.asm"
+INCLUDE "utils/memory.asm"
 
 B_FACING_LEFT	EQU	%00000001
 B_FACING_RIGHT	EQU	%00000010
@@ -211,4 +211,4 @@ bullet_draw:
 
 
 
-ENDC    ; __BULLET_INC_DEF__
+ENDC    ; __BULLET_DEF__

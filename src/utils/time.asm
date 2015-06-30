@@ -1,7 +1,7 @@
-IF	!DEF(__TIME_INC_DEF__)
-__TIME_INC_DEF__	SET 1
+IF	!DEF(__TIME_DEF__)
+__TIME_DEF__	SET 1
 
-INCLUDE "gbhw.inc"
+INCLUDE "extern/gbhw.inc"
 
 
 SECTION "time", CODE
@@ -28,4 +28,4 @@ wait:
 .wait_end:
     ret
 
-ENDC	; __TIME_INC_DEF__
+ENDC	; __TIME_DEF__
