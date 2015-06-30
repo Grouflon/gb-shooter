@@ -8,6 +8,9 @@ OBJ_DIR := ./obj/
 SRC_DIR := ./src/
 INC_DIR := ./include/ ./src/ ./data/
 
+ASM = ./tools/rgbasm
+LINK = ./tools/xlink
+
 #OBJ = $(SRC:.asm=.o)
 OBJ := $(patsubst %.asm, $(OBJ_DIR)%.o, $(SRC))
 INCLUDES := $(addprefix -i,$(INC_DIR))
@@ -15,16 +18,16 @@ INCLUDES := $(addprefix -i,$(INC_DIR))
 all: assemble link fix
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.asm
-	rgbasm $(INCLUDES) -o$@ $<
+	$(ASM) $(INCLUDES) -o$@ $<
 
 assemble: $(OBJ_DIR) $(OBJ)
 
 link: $(BIN_DIR) write_linkfile
 	@mkdir -p bin
-	xlink $(OBJ_DIR)$(LINKFILE)
+	$(LINK) $(OBJ_DIR)$(LINKFILE)
 
 fix:
-	rgbfix -p0 -v $(BIN_DIR)$(TARGET)
+	./tools/rgbfix -p0 -v $(BIN_DIR)$(TARGET)
 
 write_linkfile:
 	@echo "Writing linkfile..."
@@ -33,7 +36,9 @@ write_linkfile:
 	@echo "[Output]\n" >> $(OBJ_DIR)$(LINKFILE)
 	@echo $(BIN_DIR)$(TARGET) >> $(OBJ_DIR)$(LINKFILE)
 
-run: re
+run: re test
+
+test:
 	wine ~/bgb/bgb.exe $(BIN_DIR)$(TARGET)
 
 clean:
@@ -45,7 +50,7 @@ fclean: clean
 re : fclean all
 
 upload: $(BIN_DIR)$(TARGET)
-	sudo ~/ems-flasher/ems-flasher --write $(BIN_DIR)$(TARGET)
+	sudo ~/ems-flasher/ems-flasher --bank 2 --write $(BIN_DIR)$(TARGET)
 
 $(BIN_DIR):
 	@mkdir -p $@
