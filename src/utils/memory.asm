@@ -51,5 +51,17 @@ find_address:
 .find_address_end
 	ret
 
+NTH:		MACRO
+			ld	hl,		\1
+			ld	a,		\2
+			ld	bc,		\3
+.nth_loop\@	cp			0
+			jr	z,		.nth_end\@
+			add		hl,		bc
+			dec		a
+			jr		.nth_loop\@
+.nth_end\@
+			ENDM
+
 
 ENDC	; __MEMORY_DEF__

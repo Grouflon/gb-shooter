@@ -1,117 +1,118 @@
 IF  !DEF(__BULLET_DEF__)
 __BULLET_DEF__ SET 1
 
-INCLUDE "extern/gbhw.inc"
-INCLUDE "utils/dma.asm"
-INCLUDE "utils/memory.asm"
-
-B_FACING_LEFT	EQU	%00000001
-B_FACING_RIGHT	EQU	%00000010
-B_FACING_UP		EQU	%00000100
-B_FACING_DOWN	EQU	%00001000
-
-B_SPRITE		EQU 2
-
-			RSRESET
-B_ENABLED	RB 1
-B_SPR		RB 1
-B_Y			RB 1
-B_X			RB 1
-B_FACING	RB 1
-B_SIZEOF	RB 0
-		
-
 
 SECTION "bullet", CODE
 
-; hl	- Bullet struct address
-; b		- Sprite index
-bullet_init:
-.b_enabled
-	ld		a,		0
-	ld		[hl],	a
-.b_sprite_index
-	inc		hl
-	ld		a,		b
-	ld		[hl],	a
-.b_coords
-	inc		hl
-	ld		a,		0
+bullets_init:
+	ld		hl,	v_bullet_array
+	ld		a,	BULLETS_MAX
+.bullets_loop:
+	cp		0
+	jr		z,	.bullets_init_end
+	push	af
+
+	ld		a,		0				; Bullet on
 	ld		[hl],	a
 	inc		hl
+	ld		a,		0				; Bullet coords
 	ld		[hl],	a
-.b_facing
 	inc		hl
-	ld		a,		B_FACING_UP
 	ld		[hl],	a
-.b_init_end
+	inc		hl
+	ld		a,		BULLET_SPRITE	; Bullet sprite number
+	ld		[hl],	a
+	inc		hl
+	ld		a,		BULLET_FACING_UP ; Bullet Facing
+	ld		[hl],	a
+
+	inc		hl
+	pop		af
+	dec		a
+	jr		.bullets_loop
+.bullets_init_end:
 	ret
 
 
-; hl	- Bullet struct address
-; a		- y
+; a		- facing
 ; b		- x
-bullet_set_position:
-	inc		hl
-	inc		hl
+; c		- y
+bullet_create:
+	push	af
+	ld		hl,	v_bullet_array
+	ld		a,	BULLETS_MAX
+.bullet_find:
+	cp		0
+	jr		z,	.bullet_not_found
+	push	af
+
+	ld		a,	[hl]
+	cp 		0
+	jr		z,	.bullet_found
+	ld		de,	s_bullet_SIZEOF
+	add		hl,	de
+	pop		af
+	dec		a
+	jr		.bullet_find
+
+.bullet_found:
+	pop		af
+	
+	;	Enabled
+	ld		a,		1
 	ld		[hl],	a
+	;	Y
+	inc		hl
+	ld		a,		c
+	ld		[hl],	a
+	;	X
 	inc		hl
 	ld		a,		b
 	ld		[hl],	a
+	;	Facing
+	inc		hl
+	inc		hl
+	pop		af
+	ld		[hl],	a
+	ret
+
+.bullet_not_found
+	pop		af
 	ret
 
 
-
-; hl	- Bullet struct address
-; a		- enabled value
-bullet_set_enabled:
-	ld	[hl],	a
+bullets_update:
+	ld		hl,	v_bullet_array
+	ld		a,	BULLETS_MAX
+.bullets_update_loop:
+	cp		0
+	jr		nz,	.bullet_update
 	ret
 
-
-
-; hl	- Bullet struct address
-; a		- return value
-bullet_is_enabled:
-	ld	a,	[hl]
-	ret
-
-
-
-; hl	- Bullet struct address
-; a		- facing value
-bullet_set_facing:
-	ld	de,		B_FACING
-	add	hl,		de
-	ld	[hl],	a
-	ret
-
-
-
-; hl	- Bullet struct address
-bullet_update:
-	; do not update if disabled
+.bullet_update
+	push	af
+	;		Skip if disabled
 	ld		a,		[hl]
 	cp		0
-	ret		z
+	jr		z,		.bullet_update_end
 
 	push	hl
 	inc		hl
+	ld		a,	[hl]
+	ld		b,	a		; Y Position in b
 	inc		hl
 	ld		a,	[hl]
-	ld		b,	a
+	ld		c,	a		; X Position in c
 	inc		hl
-	ld		a,	[hl]
-	ld		c,	a
 	inc		hl
-	ld		a,	[hl]
-	cp		B_FACING_LEFT
+	ld		a,	[hl]	; Facing
+	cp		BULLET_FACING_LEFT
 	jr		z,	.b_move_left
-	cp		B_FACING_RIGHT
+	cp		BULLET_FACING_RIGHT
 	jr		z,	.b_move_right
-	cp		B_FACING_UP
+	cp		BULLET_FACING_UP
 	jr		z,	.b_move_up
-	cp		B_FACING_DOWN
+	cp		BULLET_FACING_DOWN
 	jr		z,	.b_move_down
 .b_move_left
 	dec		c
@@ -129,7 +130,6 @@ bullet_update:
 	pop		hl
 	push	hl
 	inc		hl
-	inc		hl
 	ld		a,		b
 	ld		[hl],	a
 	inc		hl
@@ -137,19 +137,28 @@ bullet_update:
 	ld		[hl],	a
 
 	pop		hl
+	push	hl
 	call	bullet_check_death
+	pop		hl
+	push	hl
+	call	z,	bullet_reset
+	pop		hl
 
-	ret
+.bullet_update_end
+	pop		af
+	dec		a
+	ld		bc,		s_bullet_SIZEOF
+	add		hl,		bc
+	jr		.bullets_update_loop
 
 ; hl	- Bullet struct address
+; f		- z if dead, nz if not
 bullet_check_death:
 	; Do nothing if disabled
 	ld		a,	[hl]
 	cp		0
 	ret		z
 
-	push	hl
-	inc		hl
 	inc		hl
 	ld		a,	[hl]
 	cp		8
@@ -162,53 +171,81 @@ bullet_check_death:
 	jr		c,	.b_dead
 	cp		169
 	jr		nc,	.b_dead
-	pop		hl
+
+	ld		a,	1
+	cp		0
 	ret
+
 .b_dead
-	pop		hl
+	ld		a,	0
+	cp		0
+	ret
+
+; hl	- Bullet struct address
+bullet_reset:
 	ld		a,		0
 	ld		[hl],	a
 	inc		hl
+	ld		[hl],	a
 	inc		hl
-	ld		a,		0
-	ld		[hl],	0
-	inc		hl
-	ld		[hl],	0
+	ld		[hl],	a
 	ret
 
 
-
-; hl	- Bullet struct address
-bullet_draw:
+bullets_draw:
+	ld		hl,		v_bullet_array
+	ld		de,		OAM_BULLETS
+	ld		a,		BULLETS_MAX
+.bullets_draw_loop:
+	cp		0
+	jr		z,		.bullets_draw_end
+	push	af
 	; don't draw if disabled
 	ld		a,		[hl]
 	cp		0
-	ret		z
+	jr		z,		.bullets_draw_continue
 
-	push	hl
-	pop		de
-	inc		de
-	ld		hl,		OAM_BUFFER
-	ld		bc,		4
-	ld		a,		[de]
-	call	find_address
-	
-	inc		de
-	; Y
-	ld		a,		[de]
-	ld		[hl],	a
-	; X
-	inc		de
+	; Y pos
 	inc		hl
-	ld		a,		[de]
-	ld		[hl],	a
-	; Sprite num
-	inc		hl
-	ld		a,		B_SPRITE
-	ld		[hl],	a
+	ld		a,		[hl]
+	ld		[de],	a
 
+	; X pos
+	inc		hl
+	inc		de
+	ld		a,		[hl]
+	ld		[de],	a
+
+	; Sprite number
+	inc		hl
+	inc		de
+	ld		a,		[hl]
+	ld		[de],	a
+
+	; Flags (Skipped)
+	inc		hl
+	inc		de
+	ld		a,		0
+	ld		[de],	a
+
+	inc 	hl
+	inc 	de
+	jr		.bullets_draw_next
+
+.bullets_draw_continue:
+	ld		bc,	s_bullet_SIZEOF
+	add		hl,	bc
+	inc		de
+	inc		de
+	inc		de
+	inc		de
+.bullets_draw_next:
+	pop		af
+	dec		a
+	jr		.bullets_draw_loop
+
+.bullets_draw_end:
 	ret
-
 
 
 ENDC    ; __BULLET_DEF__
