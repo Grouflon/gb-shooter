@@ -4,6 +4,7 @@ INCLUDE "utils/memory.asm"
 INCLUDE "utils/time.asm"
 INCLUDE "utils/display.asm"
 INCLUDE "utils/input.asm"
+INCLUDE "utils/macros.asm"
 
 INCLUDE "consts.asm"
 INCLUDE "structs.asm"

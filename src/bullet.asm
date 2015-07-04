@@ -4,33 +4,21 @@ __BULLET_DEF__ SET 1
 
 SECTION "bullet", CODE
 
-bullets_init:
-	ld		hl,	v_bullet_array
-	ld		a,	BULLETS_MAX
-.bullets_loop:
-	cp		0
-	jr		z,	.bullets_init_end
-	push	af
-
+;	hl - struct address
+bullet_init:
 	ld		a,		0				; Bullet on
-	ld		[hl],	a
-	inc		hl
+	ldi		[hl],	a
 	ld		a,		0				; Bullet coords
-	ld		[hl],	a
-	inc		hl
-	ld		[hl],	a
-	inc		hl
+	ldi		[hl],	a
+	ldi		[hl],	a
 	ld		a,		BULLET_SPRITE	; Bullet sprite number
-	ld		[hl],	a
-	inc		hl
+	ldi		[hl],	a
 	ld		a,		BULLET_FACING_UP ; Bullet Facing
-	ld		[hl],	a
+	ldi		[hl],	a
+	ret
 
-	inc		hl
-	pop		af
-	dec		a
-	jr		.bullets_loop
-.bullets_init_end:
+bullets_init:
+	FOR		v_bullet_array, BULLETS_MAX, s_bullet_SIZEOF, bullet_init
 	ret
 
 
@@ -57,20 +45,16 @@ bullet_create:
 
 .bullet_found:
 	pop		af
-	
 	;	Enabled
 	ld		a,		1
-	ld		[hl],	a
+	ldi		[hl],	a
 	;	Y
-	inc		hl
 	ld		a,		c
-	ld		[hl],	a
+	ldi		[hl],	a
 	;	X
-	inc		hl
 	ld		a,		b
-	ld		[hl],	a
+	ldi		[hl],	a
 	;	Facing
-	inc		hl
 	inc		hl
 	pop		af
 	ld		[hl],	a
@@ -81,29 +65,20 @@ bullet_create:
 	ret
 
 
-bullets_update:
-	ld		hl,	v_bullet_array
-	ld		a,	BULLETS_MAX
-.bullets_update_loop:
-	cp		0
-	jr		nz,	.bullet_update
-	ret
-
-.bullet_update
-	push	af
-	;		Skip if disabled
+; hl	- struct address
+bullet_update:
 	ld		a,		[hl]
 	cp		0
-	jr		z,		.bullet_update_end
+	ret		z
 
 	push	hl
 	inc		hl
 	ld		a,	[hl]
+	inc		hl
 	ld		b,	a		; Y Position in b
-	inc		hl
 	ld		a,	[hl]
-	ld		c,	a		; X Position in c
 	inc		hl
+	ld		c,	a		; X Position in c
 	inc		hl
 	ld		a,	[hl]	; Facing
 	cp		BULLET_FACING_LEFT
@@ -131,8 +106,7 @@ bullets_update:
 	push	hl
 	inc		hl
 	ld		a,		b
-	ld		[hl],	a
-	inc		hl
+	ldi		[hl],	a
 	ld		a,		c
 	ld		[hl],	a
 
@@ -140,16 +114,13 @@ bullets_update:
 	push	hl
 	call	bullet_check_death
 	pop		hl
-	push	hl
 	call	z,	bullet_reset
-	pop		hl
+	ret
+	
 
-.bullet_update_end
-	pop		af
-	dec		a
-	ld		bc,		s_bullet_SIZEOF
-	add		hl,		bc
-	jr		.bullets_update_loop
+bullets_update:
+	FOR		v_bullet_array, BULLETS_MAX, s_bullet_SIZEOF, bullet_update
+	ret
 
 ; hl	- Bullet struct address
 ; f		- z if dead, nz if not
