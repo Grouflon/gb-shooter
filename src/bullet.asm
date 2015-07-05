@@ -163,18 +163,13 @@ bullet_reset:
 	ret
 
 
-bullets_draw:
-	ld		hl,		v_bullet_array
-	ld		de,		OAM_BULLETS
-	ld		a,		BULLETS_MAX
-.bullets_draw_loop:
-	cp		0
-	jr		z,		.bullets_draw_end
-	push	af
+; hl	- Struct address
+; de	- OAM buffer struct address
+bullet_draw:
 	; don't draw if disabled
 	ld		a,		[hl]
 	cp		0
-	jr		z,		.bullets_draw_continue
+	ret		z
 
 	; Y pos
 	inc		hl
@@ -198,24 +193,11 @@ bullets_draw:
 	inc		de
 	ld		a,		0
 	ld		[de],	a
+	ret
 
-	inc 	hl
-	inc 	de
-	jr		.bullets_draw_next
 
-.bullets_draw_continue:
-	ld		bc,	s_bullet_SIZEOF
-	add		hl,	bc
-	inc		de
-	inc		de
-	inc		de
-	inc		de
-.bullets_draw_next:
-	pop		af
-	dec		a
-	jr		.bullets_draw_loop
-
-.bullets_draw_end:
+bullets_draw:
+	OAM_FOR	v_bullet_array, OAM_BULLETS, BULLETS_MAX, s_bullet_SIZEOF, bullet_draw
 	ret
 
 
