@@ -189,7 +189,6 @@ bullet_draw:
 	ld		[de],	a
 
 	; Flags (Skipped)
-	inc		hl
 	inc		de
 	ld		a,		0
 	ld		[de],	a

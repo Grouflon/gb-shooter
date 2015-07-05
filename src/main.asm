@@ -4,27 +4,15 @@ INCLUDE "utils/memory.asm"
 INCLUDE "utils/time.asm"
 INCLUDE "utils/display.asm"
 INCLUDE "utils/input.asm"
+INCLUDE "utils/log.asm"
 INCLUDE "utils/macros.asm"
 
 INCLUDE "consts.asm"
 INCLUDE "structs.asm"
 INCLUDE "ram_map.asm"
-
-
-LOG:	MACRO
-I		SET		0
-		push	af
-		REPT	STRLEN(\1)
-		ld		a,			STRSUB(\1, I+1, 1)
-		ld		[_SCRN0+I],	a
-I		SET		I+1
-		ENDR
-		pop		af
-		ENDM
-
-
 INCLUDE "player.asm"
 INCLUDE "bullet.asm"
+INCLUDE "enemy.asm"
 
 
 SECTION "graphics",	DATA
@@ -118,9 +106,12 @@ initialize:
 	call	mem_copy
 
 game_init:
-	LOG		"LOG TEST"
+;	LOG		"LOG TEST"
+	ld		a,	%00101011
+	LOGR	a
 
 	call	player_init
+	call	enemies_init
 	call	bullets_init
 
 startup:
@@ -141,6 +132,7 @@ loop:
 
 	call	player_draw
 	call	bullets_draw
+	call	enemies_draw
 
 	halt
 	jp		loop
