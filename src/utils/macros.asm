@@ -52,4 +52,59 @@ OAM_FOR:	MACRO
 			ENDM
 
 
+SWP8:	MACRO
+		
+		IF	STRCMP("\1", "\2")
+			IF STRCMP("\1", "h") && STRCMP("\1", "l") && STRCMP("\2", "h") && STRCMP("\2", "l")
+SWP8_REG		EQUS	"h"
+SWP8_REG16		EQUS	"hl"
+			ENDC
+			IF !STRCMP("\1", "h") || !STRCMP("\1", "l") || !STRCMP("\2", "h") || !STRCMP("\2", "l")
+				IF !STRCMP("\1", "h") || !STRCMP("\1", "l")
+					IF !STRCMP("\2", "h") || !STRCMP("\2", "l")				
+SWP8_REG				EQUS	"a"
+SWP8_REG16				EQUS	"af"
+					ENDC
+					IF !STRCMP("\2", "a")
+SWP8_REG				EQUS	"b"
+SWP8_REG16				EQUS	"bc"
+					ENDC
+					IF STRCMP("\2", "a")
+SWP8_REG				EQUS	"a"
+SWP8_REG16				EQUS	"af"
+					ENDC
+				ENDC
+				IF !STRCMP("\2", "h") || !STRCMP("\2", "l")
+					IF !STRCMP("\1", "h") || !STRCMP("\1", "l")				
+SWP8_REG				EQUS	"a"
+SWP8_REG16				EQUS	"af"
+					ENDC
+					IF !STRCMP("\1", "a")
+SWP8_REG				EQUS	"b"
+SWP8_REG16				EQUS	"bc"
+					ENDC
+					IF STRCMP("\1", "a")
+SWP8_REG				EQUS	"a"
+SWP8_REG16				EQUS	"af"
+					ENDC
+				ENDC
+			ENDC
+			push	SWP8_REG16
+			ld		SWP8_REG,	\1
+			ld		\1,			\2
+			ld		\2,			SWP8_REG
+			pop		SWP8_REG16
+
+			PURGE	SWP8_REG, SWP8_REG16
+		ENDC
+		ENDM
+
+
+SWP16:	MACRO
+		push	\1
+		push	\2
+		pop		\1
+		pop		\2
+		ENDM
+
 ENDC	; __MACROS_DEF__

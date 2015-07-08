@@ -110,6 +110,11 @@ game_init:
 	ld		a,	%00101011
 	LOGR	a
 
+	ld		a,	$f0
+	ld		hl,	$0f0f
+	SWP16	af,	hl
+	LOGR	a
+
 	call	player_init
 	call	enemies_init
 	call	bullets_init
