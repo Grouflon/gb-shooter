@@ -125,14 +125,6 @@ initialize:
 	call	mem_copy
 
 game_init:
-;	LOG		"LOG TEST"
-
-;	ld		a,	$7e
-;	LOGR8H	a, _SCRN0+2
-	
-;	ld		hl,	$12ac
-;	LOGR16H	sp,	_SCRN0+64
-
 	call	player_init
 	call	enemies_init
 	call	bullets_init
@@ -156,9 +148,6 @@ loop:
 	call	player_draw
 	call	bullets_draw
 	call	enemies_draw
-
-	ld		a,	[v_player_x]
-	LOGR8I	a, _SCRN0+32
 
 	halt
 	jp		loop
