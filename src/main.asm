@@ -7,6 +7,25 @@ INCLUDE "utils/input.asm"
 INCLUDE "utils/log.asm"
 INCLUDE "utils/macros.asm"
 
+SECTION "break",	CODE
+brk:	push	hl
+		ld		hl, 2
+		add		hl,	sp
+		push	af
+		ld		a,	[hl]
+		LOGR8H	a,	_SCRN0+2
+		inc		hl
+		ld		a,	[hl]
+		LOGR8H	a,	_SCRN0
+		pop		af
+		pop		hl
+		ret
+
+
+BREAK:	MACRO
+		call	brk
+		ENDM
+
 INCLUDE "consts.asm"
 INCLUDE "structs.asm"
 INCLUDE "ram_map.asm"
@@ -108,11 +127,11 @@ initialize:
 game_init:
 ;	LOG		"LOG TEST"
 
-	ld		a,	$7e
-	LOGR8H	a, _SCRN0+2
+;	ld		a,	$7e
+;	LOGR8H	a, _SCRN0+2
 	
-	ld		hl,	$12ac
-	LOGR16H	sp,	_SCRN0+64
+;	ld		hl,	$12ac
+;	LOGR16H	sp,	_SCRN0+64
 
 	call	player_init
 	call	enemies_init

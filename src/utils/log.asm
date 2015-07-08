@@ -1,6 +1,9 @@
 IF  !DEF(__LOG_DEF__)
 __LOG_DEF__ SET 1
 
+; Log macros write the ascii code of each character of your string/number,
+; starting at the given memory location
+
 ; \1	- String to log
 ; \2	- Log starting address
 LOG:	MACRO
