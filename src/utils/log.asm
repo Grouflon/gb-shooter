@@ -14,7 +14,7 @@ I		SET		I+1
 		ENDM
 
 
-LOGR:	MACRO
+LOGR8:	MACRO
 CB		SET		0
 		REPT	8
 
@@ -33,6 +33,55 @@ PURGE	CB
 		ENDM
 
 
+LOGR8I:	MACRO
+
+		; Save everything
+		push	af
+		push	bc
+		push	de
+		push	hl
+
+		; init
+		ld		a,	\1
+		ld		b,	0
+		ld		c,	0
+		ld		d,	0
+
+.loop\@ cp		0
+		jr		z,	.draw\@
+		dec		a
+		inc		b
+		SWP8	a,	b
+		cp		10
+		SWP8	a,	b
+		jr		nz,	.loop\@
+		ld		b,	0
+		inc		c
+		SWP8	a,	c
+		cp		10
+		SWP8	a,	c
+		jr		nz, .loop\@
+		ld		c,	0
+		inc		d
+		jr		.loop\@
+
+.draw\@	ld		a,			"0"
+		add		a,			d
+		ld		[_SCRN0],	a
+		ld		a,			"0"
+		add		a,			c
+		ld		[_SCRN0+1],	a
+		ld		a,			"0"
+		add		a,			b
+		ld		[_SCRN0+2],	a
+
+		; Restore everything
+		pop		hl
+		pop		de
+		pop		bc
+		pop		af
+
+		ENDM
 
 
 ENDC    ; __LOG_DEF__
