@@ -108,8 +108,11 @@ initialize:
 game_init:
 ;	LOG		"LOG TEST"
 
-	ld		a,	$ff
-	LOGR8I	a
+	ld		a,	$7e
+	LOGR8H	a, _SCRN0+2
+	
+	ld		hl,	$12ac
+	LOGR16H	sp,	_SCRN0+64
 
 	call	player_init
 	call	enemies_init
@@ -136,7 +139,7 @@ loop:
 	call	enemies_draw
 
 	ld		a,	[v_player_x]
-	LOGR8I	a
+	LOGR8I	a, _SCRN0+32
 
 	halt
 	jp		loop

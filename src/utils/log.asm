@@ -1,19 +1,22 @@
 IF  !DEF(__LOG_DEF__)
 __LOG_DEF__ SET 1
 
-
+; \1	- String to log
+; \2	- Log starting address
 LOG:	MACRO
 I		SET		0
 		push	af
 		REPT	STRLEN(\1)
 		ld		a,			STRSUB(\1, I+1, 1)
-		ld		[_SCRN0+I],	a
+		ld		[\2+I],	a
 I		SET		I+1
 		ENDR
 		pop		af
 		ENDM
 
 
+; \1	- 8bit Register to log
+; \2	- Log starting address
 LOGR8:	MACRO
 CB		SET		0
 		REPT	8
@@ -24,7 +27,7 @@ CB		SET		0
 .one\@	ld		a,		"1"
 		jr		.draw\@
 .zero\@	ld		a,		"0"
-.draw\@	ld		[_SCRN0+7-CB],	a
+.draw\@	ld		[\2+7-CB],	a
 		pop		af
 		
 CB		SET		CB+1
@@ -33,13 +36,14 @@ PURGE	CB
 		ENDM
 
 
+; \1	- 8bit Register to log
+; \2	- Log starting address
 LOGR8I:	MACRO
 
 		; Save everything
 		push	af
 		push	bc
 		push	de
-		push	hl
 
 		; init
 		ld		a,	\1
@@ -67,20 +71,99 @@ LOGR8I:	MACRO
 
 .draw\@	ld		a,			"0"
 		add		a,			d
-		ld		[_SCRN0],	a
+		ld		[\2],	a
 		ld		a,			"0"
 		add		a,			c
-		ld		[_SCRN0+1],	a
+		ld		[\2 + 1],	a
 		ld		a,			"0"
 		add		a,			b
-		ld		[_SCRN0+2],	a
+		ld		[\2 + 2],	a
 
 		; Restore everything
-		pop		hl
 		pop		de
 		pop		bc
 		pop		af
 
+		ENDM
+
+
+; \1	- 8bit Register to log
+; \2	- Log starting address
+LOGR8H:	MACRO
+
+		; Save everything
+		push	af
+		push	bc
+
+		; init
+		ld		a,	\1
+		ld		b,	0
+		ld		c,	0
+
+.loop\@ cp		0
+		jr		z,	.draw\@
+		dec		a
+		inc		b
+		SWP8	a,	b
+		cp		16
+		SWP8	a,	b
+		jr		nz,	.loop\@
+		ld		b,	0
+		inc		c
+		jr		.loop\@
+
+.draw\@	ld		a,			c
+		cp		9
+		jr		nc,			.chex\@
+		ld		a,			"0"
+		jr		.drw0\@
+.chex\@	ld		a,			c
+		sub		10
+		ld		c,			a
+		ld		a,			"A"
+.drw0\@	add		a,			c
+		ld		[\2],	a
+		ld		a,			b
+		cp		9
+		jr		nc,			.bhex\@
+		ld		a,			"0"
+		jr		.drw1\@
+.bhex\@	ld		a,			b
+		sub		10
+		ld		b,			a
+		ld		a,			"A"
+.drw1\@	add		a,			b
+		ld		[\2+1],	a
+
+		; Restore everything
+		pop		bc
+		pop		af
+
+		ENDM
+
+; \1	- 8bit Register to log
+; \2	- Log starting address
+
+LOGR16H:MACRO
+		IF !STRCMP("\1", "bc")
+			LOGR8H	b,	\2
+			LOGR8H	c,	(\2+2)
+		ENDC
+		IF !STRCMP("\1", "de")
+			LOGR8H	d,	\2
+			LOGR8H	e,	(\2+2)
+		ENDC
+		IF !STRCMP("\1", "hl")
+			LOGR8H	h,	\2
+			LOGR8H	l,	(\2+2)
+		ENDC
+		IF !STRCMP("\1", "sp")
+			push	hl
+			ld		hl, 2
+			add		hl, sp
+			LOGR16H	hl,	\2
+			pop		hl
+		ENDC
 		ENDM
 
 
