@@ -155,10 +155,8 @@ bullet_check_death:
 ; hl	- Bullet struct address
 bullet_reset:
 	ld		a,		0
-	ld		[hl],	a
-	inc		hl
-	ld		[hl],	a
-	inc		hl
+	ldi		[hl],	a
+	ldi		[hl],	a
 	ld		[hl],	a
 	ret
 
@@ -169,7 +167,7 @@ bullet_draw:
 	; don't draw if disabled
 	ld		a,		[hl]
 	cp		0
-	ret		z
+	jp		z,	.off
 
 	; Y pos
 	inc		hl
@@ -191,6 +189,12 @@ bullet_draw:
 	; Flags (Skipped)
 	inc		de
 	ld		a,		0
+	ld		[de],	a
+	ret
+.off:
+	ld		a,		0
+	ld		[de],	a
+	inc		de
 	ld		[de],	a
 	ret
 

@@ -9,7 +9,7 @@ enemy_init:
 	ld		a,		1
 	ldi		[hl],	a
 	ld		a,		50
-	ld		[hl],	a
+	ldi		[hl],	a
 	ldi		[hl],	a
 	ld		a,		ENEMY_SPRITE
 	ld		[hl],	a
@@ -25,7 +25,7 @@ enemy_draw:
 	; don't draw if disabled
 	ld		a,		[hl]
 	cp		0
-	ret		z
+	jr		z,		.off
 
 	; Y pos
 	inc		hl
@@ -46,8 +46,22 @@ enemy_draw:
 
 	; Flags
 	inc		de
-	ld		a,		OAMF_PAL0
+	ld		a,		OAMF_PAL1
 	ld		[de],	a
+	ret
+.off:
+	ld		a,		0
+	ld		[de],	a
+	inc		de
+	ld		[de],	a
+
+
+; hl	- strcut address
+enemy_reset:
+	ld	a,		0
+	ldi	[hl],	a
+	ldi	[hl],	a
+	ld	[hl],	a
 	ret
 
 

@@ -32,6 +32,7 @@ INCLUDE "ram_map.asm"
 INCLUDE "player.asm"
 INCLUDE "bullet.asm"
 INCLUDE "enemy.asm"
+INCLUDE "collisions.asm"
 
 
 SECTION "graphics",	DATA
@@ -144,6 +145,7 @@ loop:
 
 	call	player_update
 	call	bullets_update
+	call	collisions_update
 
 	call	player_draw
 	call	bullets_draw

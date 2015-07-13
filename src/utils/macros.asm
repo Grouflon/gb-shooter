@@ -2,7 +2,8 @@ IF	!DEF(__MACROS_DEF__)
 __MACROS_DEF__	SET 1
 
 FOR:		MACRO
-
+			push	hl
+			push	af
 			ld		hl,	\1	; Start address
 			ld		a,	\2	; Iterations count
 
@@ -16,10 +17,14 @@ FOR:		MACRO
 			pop		af
 
 			dec		a
+			push	bc
 			ld		bc,	\3
 			add		hl,	bc
+			pop		bc
 			jr		.for\@
-.forend\@	
+.forend\@
+			pop		af
+			pop		hl
 			ENDM
 
 
