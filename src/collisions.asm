@@ -42,6 +42,7 @@ bullet_enemy_collision:
 	sub		ENEMY_HEIGHT
 	SWP8	a,	d
 	add		2
+	cp		d
 	ret		c
 
 	inc		hl
@@ -56,6 +57,7 @@ bullet_enemy_collision:
 	sub		ENEMY_WIDTH
 	SWP8	a,	d
 	add		2
+	cp		d
 	ret		c
 
 	dec		hl
@@ -69,16 +71,46 @@ bullet_enemy_collision:
 
 	ret
 
+
 ; hl	- enemy address
 player_enemy_collision:
-	ld		a,	[hl]
+	ld		a,	[v_player + s_player_on]
+	and		[hl]
 	cp		0
-	ret		z	; leave if enemy off
+	ret		z	; leave if enemy or player off
 
-;	inc		hl
-;	ld		bc,	v_player_y
+	inc		hl
+	ld		a,	[v_player + s_player_y]
+	ld		b,	a
+	ld		a,	[hl]
+	add		ENEMY_HEIGHT
+	cp		b
+	ret		c
+	sub		ENEMY_HEIGHT
+	SWP8	a,	b
+	add		PLAYER_HEIGHT
+	cp		b
+	ret		c
+	
+	inc		hl
+	ld		a,	[v_player + s_player_x]
+	ld		b,	a
+	ld		a,	[hl]
+	add		ENEMY_WIDTH
+	cp		b
+	ret		c
+	sub		ENEMY_WIDTH
+	SWP8	a,	b
+	add		PLAYER_WIDTH
+	cp		b
+	ret		c
+
+	dec		hl
+	dec		hl
+	call	enemy_reset
+	call	player_reset
+
 	ret
-
 	
 
 ENDC    ; __COLLISIONS_DEF__
