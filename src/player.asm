@@ -6,15 +6,24 @@ SECTION "player", CODE
 
 player_init:
 .init_player
-	ld		a,					PLAYER_H_SPRITE
-	ld		[v_player_sprite],	a
-	ld		a,					40
-	ld		[v_player_x],		a
-	ld		[v_player_y],		a
-	ld		a,					PLAYER_FACING_LEFT
-	ld		[v_player_facing],	a
+	ld		hl,		v_player
+	ld		a,		1
+	ldi		[hl],	a
+	ld		a,		40
+	ldi		[hl],	a
+	ldi		[hl],	a
+	ld		a,		PLAYER_FACING_LEFT
+	ld		[hl],	a
 	ret
 
+
+player_reset:
+	ld		hl,		v_player
+	ld		a,		0
+	ldi		[hl],	a
+	ldi		[hl],	a
+	ldi		[hl],	a
+	ret
 
 
 player_draw:
@@ -22,17 +31,17 @@ player_draw:
 
 .update_sprite
 	; Y
-	ld	a,		[v_player_y]
+	ld	a,		[v_player + s_player_y]
 	ld	[hl],	a
 
 	; X
 	inc	hl
-	ld	a,		[v_player_x]
+	ld	a,		[v_player + s_player_x]
 	ld	[hl],	a
 
 	; Sprite number
 	inc	hl
-	ld	a,	[v_player_facing]
+	ld	a,	[v_player + s_player_facing]
 	cp	PLAYER_FACING_LEFT
 	jr	z, .sprite_horizontal
 	cp	PLAYER_FACING_RIGHT
@@ -52,7 +61,7 @@ player_draw:
 	; Attributes
 	inc	hl
 	ld	b,	OAMF_PAL0
-	ld	a,	[v_player_facing]
+	ld	a,	[v_player + s_player_facing]
 	ld	c,	a
 	cp  PLAYER_FACING_LEFT
 	jr	nz,	.attr_vertical
@@ -75,6 +84,10 @@ player_draw:
 
 
 player_update:
+	ld		a,	[v_player]
+	cp		0
+	ret		z	; leave if player off
+
 	ld		a,	[INPUT]
 	and		PADF_RIGHT
 	call	nz,	player_move_right
@@ -100,58 +113,58 @@ player_update:
 
 
 player_move_right:
-	ld		a,					[v_player_x]
+	ld		a,	[v_player + s_player_x]
 	inc		a
 	cp		160
 	ret		z
-	ld		[v_player_x],		a
-	ld		a,					PLAYER_FACING_RIGHT
-	ld		[v_player_facing],	a
+	ld		[v_player + s_player_x],		a
+	ld		a,								PLAYER_FACING_RIGHT
+	ld		[v_player + s_player_facing],	a
 	ret
 
 
 
 player_move_left:
-	ld		a,					[v_player_x]
+	ld		a,	[v_player + s_player_x]
 	cp		8
 	ret		z
 	dec		a
-	ld		[v_player_x],		a
-	ld		a,					PLAYER_FACING_LEFT
-	ld		[v_player_facing],	a
+	ld		[v_player + s_player_x],		a
+	ld		a,								PLAYER_FACING_LEFT
+	ld		[v_player + s_player_facing],	a
 	ret
 
 
 
 player_move_up:
-	ld		a,					[v_player_y]
+	ld		a,	[v_player + s_player_y]
 	cp		16
 	ret		z
 	dec		a
-	ld		[v_player_y],		a
-	ld		a,					PLAYER_FACING_UP
-	ld		[v_player_facing],	a
+	ld		[v_player + s_player_y],	a
+	ld		a,							PLAYER_FACING_UP
+	ld		[v_player + s_player_facing],	a
 	ret
 
 	
 
 player_move_down:
-	ld		a,					[v_player_y]
+	ld		a,	[v_player + s_player_y]
 	cp		152
 	ret		z
 	inc		a
-	ld		[v_player_y],		a
-	ld		a,					PLAYER_FACING_DOWN
-	ld		[v_player_facing],	a
+	ld		[v_player + s_player_y],		a
+	ld		a,								PLAYER_FACING_DOWN
+	ld		[v_player + s_player_facing],	a
 	ret
 
 
 player_fire_bullet:
-	ld		a,	[v_player_x]
+	ld		a,	[v_player + s_player_x]
 	ld		b,	a
-	ld		a,	[v_player_y]
+	ld		a,	[v_player + s_player_y]
 	ld		c,	a
-	ld		a,	[v_player_facing]
+	ld		a,	[v_player + s_player_facing]
 	call	bullet_create
 	ret
 

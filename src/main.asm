@@ -71,6 +71,31 @@ initialize:
 	; copy dma buffer transfer routine
 	call	copy_dma_code
 
+	call	disable_lcd
+
+	; Load sprites data
+	ld		de,		_VRAM
+	ld		bc,		sprites_end - sprites
+	ld		hl,		sprites
+	call	mem_copy
+
+	; Load tiles data
+	ld		de,		$8800
+	ld		bc,		tiles_end - tiles
+	ld		hl,		tiles
+	call	mem_copy
+
+	; Load font data
+	ld		de,		FONT_TILES
+	ld		bc,		font_end - font
+	ld		hl,		font
+	call	mem_copy
+
+game_init:	
+	di
+    ld		sp,	$ffff
+	call	disable_lcd
+
 	; Init Palettes
 	ld	a,			%11100100
 	ld	[rBGP],		a
@@ -78,8 +103,6 @@ initialize:
 	ld	[rOBP0],	a
 	ld	a,			%00011011
 	ld	[rOBP1],	a
-
-	call	disable_lcd
 
 	; Init scroll
 	ld	a,		0
@@ -107,25 +130,6 @@ initialize:
 	ld		l,		0
 	call	mem_fill
 
-	; Load sprites data
-	ld		de,		_VRAM
-	ld		bc,		sprites_end - sprites
-	ld		hl,		sprites
-	call	mem_copy
-
-	; Load tiles data
-	ld		de,		$8800
-	ld		bc,		tiles_end - tiles
-	ld		hl,		tiles
-	call	mem_copy
-
-	; Load font data
-	ld		de,		FONT_TILES
-	ld		bc,		font_end - font
-	ld		hl,		font
-	call	mem_copy
-
-game_init:
 	call	player_init
 	call	enemies_init
 	call	bullets_init

@@ -4,6 +4,7 @@ __COLLISIONS_DEF__ SET 1
 
 collisions_update:
 	FOR	v_bullet_array, BULLETS_MAX, s_bullet_SIZEOF, bullet_enemies_loop
+	FOR	v_enemy_array, ENEMIES_MAX, s_enemy_SIZEOF, player_enemy_collision
 	ret
 
 ; hl	- bullet address
@@ -67,5 +68,17 @@ bullet_enemy_collision:
 	call	bullet_reset
 
 	ret
+
+; hl	- enemy address
+player_enemy_collision:
+	ld		a,	[hl]
+	cp		0
+	ret		z	; leave if enemy off
+
+;	inc		hl
+;	ld		bc,	v_player_y
+	ret
+
+	
 
 ENDC    ; __COLLISIONS_DEF__
