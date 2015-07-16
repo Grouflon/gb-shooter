@@ -12,7 +12,7 @@ DS		s_bullet_SIZEOF
 ENDR
 
 SECTION "enemy_vars", BSS
-v_enemy_array
+v_enemy_array:
 REPT	ENEMIES_MAX
 DS		s_bullet_SIZEOF
 ENDR

@@ -33,7 +33,8 @@ INCLUDE "player.asm"
 INCLUDE "bullet.asm"
 INCLUDE "enemy.asm"
 INCLUDE "collisions.asm"
-
+INCLUDE "enemy_spawner.asm"
+INCLUDE "game_manager.asm"
 
 SECTION "graphics",	DATA
 graphics:
@@ -130,9 +131,25 @@ game_init:
 	ld		l,		0
 	call	mem_fill
 
+	call	enemy_spawner_init
 	call	player_init
 	call	enemies_init
 	call	bullets_init
+	call	game_manager_init
+
+	ld		hl,		v_enemy_array
+	ld		a,		1
+	ldi		[hl],	a
+	ld		a,		50
+	ldi		[hl],	a
+	ldi		[hl],	a
+
+	ld		hl,		v_enemy_array + s_enemy_SIZEOF
+	ld		a,		1
+	ldi		[hl],	a
+	ld		a,		80
+	ldi		[hl],	a
+	ldi		[hl],	a
 
 startup:
 	; Set LCD
@@ -151,9 +168,15 @@ loop:
 	call	bullets_update
 	call	collisions_update
 
+	call	game_manager_update
+
 	call	player_draw
 	call	bullets_draw
 	call	enemies_draw
 
-	halt
+	
+	call	wait_vblank
+	; can touch vram now
+	call	game_manager_draw
+
 	jp		loop

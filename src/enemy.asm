@@ -6,9 +6,9 @@ SECTION "enemies", CODE
 
 ; hl	- struct address
 enemy_init:
-	ld		a,		1
+	ld		a,		0
 	ldi		[hl],	a
-	ld		a,		50
+	ld		a,		0
 	ldi		[hl],	a
 	ldi		[hl],	a
 	ld		a,		ENEMY_SPRITE

@@ -1,11 +1,16 @@
 IF	!DEF(__MACROS_DEF__)
 __MACROS_DEF__	SET 1
 
+
+; \1	- Start address
+; \2	- Iterations count
+; \3	- Step size
+; \4	- Function to call with hl pointing at the right address
 FOR:		MACRO
 			push	hl
 			push	af
-			ld		hl,	\1	; Start address
-			ld		a,	\2	; Iterations count
+			ld		hl,	\1
+			ld		a,	\2
 
 .for\@		cp		0
 			jr		z,	.forend\@
