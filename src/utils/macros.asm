@@ -117,4 +117,38 @@ SWP16:	MACRO
 		pop		\2
 		ENDM
 
+
+HILO:	MACRO
+		IF !STRCMP("\1", "bc")
+HI			EQUS	"b"
+LO			EQUS	"c"
+		ENDC
+		IF !STRCMP("\1", "de")
+HI			EQUS	"d"
+LO			EQUS	"e"
+		ENDC
+		IF !STRCMP("\1", "hl")
+HI			EQUS	"h"
+LO			EQUS	"l"
+		ENDC
+		ENDM
+
+
+CP16:	MACRO
+		HILO	\1
+	
+		push	\1
+		ld		a,	HI
+		ld		\1,	\2
+		cp		HI
+		jr		nz,	.end
+		pop		\1
+		push	\1
+		ld		a,	LO
+		ld		\1,	\2
+		cp		LO
+.end:
+		PURGE	HI, LO
+		ENDM
+
 ENDC	; __MACROS_DEF__
