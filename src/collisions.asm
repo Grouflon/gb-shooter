@@ -26,6 +26,7 @@ bullet_enemy_collision:
 	cp		0
 	ret		z	; leave if enemy off
 
+	push	bc
 	; point to Y coord
 	inc		hl
 	inc		bc
@@ -38,12 +39,12 @@ bullet_enemy_collision:
 	SWP8	a,	d
 	add		ENEMY_HEIGHT
 	cp		d
-	ret		c
+	jr		c,	.end
 	sub		ENEMY_HEIGHT
 	SWP8	a,	d
 	add		2
 	cp		d
-	ret		c
+	jr		c,	.end
 
 	inc		hl
 	inc		bc
@@ -53,12 +54,12 @@ bullet_enemy_collision:
 	SWP8	a,	d
 	add		ENEMY_WIDTH
 	cp		d
-	ret		c
+	jr		c,	.end
 	sub		ENEMY_WIDTH
 	SWP8	a,	d
 	add		2
 	cp		d
-	ret		c
+	jr		c,	.end
 
 	dec		hl
 	dec		hl
@@ -69,6 +70,8 @@ bullet_enemy_collision:
 	pop		hl
 	call	bullet_reset
 
+.end:
+	pop		bc
 	ret
 
 
