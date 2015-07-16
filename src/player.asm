@@ -9,10 +9,11 @@ player_init:
 	ld		hl,		v_player
 	ld		a,		1
 	ldi		[hl],	a
-	ld		a,		40
+	ld		a,		140
 	ldi		[hl],	a
+	ld		a,		80
 	ldi		[hl],	a
-	ld		a,		PLAYER_FACING_LEFT
+	ld		a,		PLAYER_FACING_UP
 	ld		[hl],	a
 	ret
 
@@ -118,8 +119,8 @@ player_move_right:
 	cp		160
 	ret		z
 	ld		[v_player + s_player_x],		a
-	ld		a,								PLAYER_FACING_RIGHT
-	ld		[v_player + s_player_facing],	a
+;	ld		a,								PLAYER_FACING_RIGHT
+;	ld		[v_player + s_player_facing],	a
 	ret
 
 
@@ -130,8 +131,8 @@ player_move_left:
 	ret		z
 	dec		a
 	ld		[v_player + s_player_x],		a
-	ld		a,								PLAYER_FACING_LEFT
-	ld		[v_player + s_player_facing],	a
+;	ld		a,								PLAYER_FACING_LEFT
+;	ld		[v_player + s_player_facing],	a
 	ret
 
 
@@ -142,8 +143,8 @@ player_move_up:
 	ret		z
 	dec		a
 	ld		[v_player + s_player_y],	a
-	ld		a,							PLAYER_FACING_UP
-	ld		[v_player + s_player_facing],	a
+;	ld		a,							PLAYER_FACING_UP
+;	ld		[v_player + s_player_facing],	a
 	ret
 
 	
@@ -154,8 +155,8 @@ player_move_down:
 	ret		z
 	inc		a
 	ld		[v_player + s_player_y],		a
-	ld		a,								PLAYER_FACING_DOWN
-	ld		[v_player + s_player_facing],	a
+;	ld		a,								PLAYER_FACING_DOWN
+;	ld		[v_player + s_player_facing],	a
 	ret
 
 
