@@ -117,7 +117,8 @@ SWP16:	MACRO
 		pop		\2
 		ENDM
 
-
+; Define HI LO with the corresponding register of the 16bit register passed as \1
+; You should purge HI and LO as soon as you used them in order to be able to reuse this macro
 HILO:	MACRO
 		IF !STRCMP("\1", "bc")
 HI			EQUS	"b"
@@ -134,6 +135,9 @@ LO			EQUS	"l"
 		ENDM
 
 
+; \1	- 16bit register to compare
+; \2	- Number to compare with
+; This macro loses the content of a
 CP16:	MACRO
 		HILO	\1
 	
@@ -147,6 +151,7 @@ CP16:	MACRO
 		ld		a,	LO
 		ld		\1,	\2
 		cp		LO
+		pop		\1
 .end:
 		PURGE	HI, LO
 		ENDM
