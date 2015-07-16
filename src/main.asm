@@ -140,15 +140,17 @@ game_init:
 	ld		hl,		v_enemy_array
 	ld		a,		1
 	ldi		[hl],	a
-	ld		a,		50
+	ld		a,		0
 	ldi		[hl],	a
+	ld		a,		50
 	ldi		[hl],	a
 
 	ld		hl,		v_enemy_array + s_enemy_SIZEOF
 	ld		a,		1
 	ldi		[hl],	a
-	ld		a,		80
+	ld		a,		20
 	ldi		[hl],	a
+	ld		a,		80
 	ldi		[hl],	a
 
 startup:
@@ -165,6 +167,7 @@ loop:
 	call	update_input
 
 	call	player_update
+	call	enemies_update
 	call	bullets_update
 	call	collisions_update
 

@@ -21,6 +21,29 @@ enemies_init:
 	ret
 
 
+enemies_update:
+	FOR		v_enemy_array, ENEMIES_MAX, s_enemy_SIZEOF, enemy_update
+	ret
+
+
+; hl	- struct address
+enemy_update:
+	push	hl
+	ld	bc,	s_enemy_y
+	add	hl,	bc
+	ld	a,	[hl]
+	inc	a
+	cp	161
+	jr	nc,	.out
+	ld	[hl],	a
+	pop	hl
+	ret
+.out:
+	pop	hl
+	call	enemy_reset
+	ret
+
+
 enemy_draw:
 	; don't draw if disabled
 	ld		a,		[hl]
