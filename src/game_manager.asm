@@ -30,12 +30,12 @@ game_manager_update:
 	cp	0
 	jr	z,	.lose
 
-	ld	a,	0
-	ld	[v_game_enemy_count],	a
-	FOR	v_enemy_array, ENEMIES_MAX, s_enemy_SIZEOF, game_manager_check_enemy
-	ld	a,	[v_game_enemy_count]
-	cp	0
-	jr	z,	.win
+;	ld	a,	0
+;	ld	[v_game_enemy_count],	a
+;	FOR	v_enemy_array, ENEMIES_MAX, s_enemy_SIZEOF, game_manager_check_enemy
+;	ld	a,	[v_game_enemy_count]
+;	cp	0
+;	jr	z,	.win
 	ret
 
 .lose:

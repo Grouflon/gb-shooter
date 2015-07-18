@@ -10,11 +10,13 @@ v_bullet_array:
 REPT	BULLETS_MAX
 DS		s_bullet_SIZEOF
 ENDR
+v_bullet_array_end:
 
 SECTION "enemy_vars", BSS
 v_enemy_array:
 REPT	ENEMIES_MAX
-DS		s_bullet_SIZEOF
+DS		s_enemy_SIZEOF
 ENDR
+v_enemy_array_end:
 
 ENDC	; __RAM_MAP_DEF__

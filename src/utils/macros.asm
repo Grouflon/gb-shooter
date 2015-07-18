@@ -145,14 +145,14 @@ CP16:	MACRO
 		ld		a,	HI
 		ld		\1,	\2
 		cp		HI
-		jr		nz,	.end
+		jr		nz,	.end\@
 		pop		\1
 		push	\1
 		ld		a,	LO
 		ld		\1,	\2
 		cp		LO
+.end\@:
 		pop		\1
-.end:
 		PURGE	HI, LO
 		ENDM
 

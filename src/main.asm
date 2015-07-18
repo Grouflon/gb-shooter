@@ -33,8 +33,8 @@ INCLUDE "player.asm"
 INCLUDE "bullet.asm"
 INCLUDE "enemy.asm"
 INCLUDE "collisions.asm"
-INCLUDE "enemy_spawner.asm"
 INCLUDE "game_manager.asm"
+INCLUDE "level_controller.asm"
 
 SECTION "graphics",	DATA
 graphics:
@@ -48,6 +48,11 @@ font:
 INCLUDE "data/font.asm"
 font_end:
 graphics_end:
+
+SECTION	"levels", DATA
+level:
+INCLUDE "data/level.asm"
+level_end:
 
 
 SECTION	"main_vars",	BSS
@@ -63,7 +68,7 @@ main:
     nop
 	jp initialize
 
-	ROM_HEADER	ROM_NOMBC, ROM_SIZE_32KBYTE, RAM_SIZE_0KBYTE
+	ROM_HEADER	"SPACE SHOOTER", ROM_NOMBC, ROM_SIZE_32KBYTE, RAM_SIZE_0KBYTE
 
 initialize:
 	di
@@ -131,27 +136,27 @@ game_init:
 	ld		l,		0
 	call	mem_fill
 
-	call	enemy_spawner_init
 	call	player_init
 	call	enemies_init
 	call	bullets_init
 	call	game_manager_init
+	call	level_controller_init
 
-	ld		hl,		v_enemy_array
-	ld		a,		1
-	ldi		[hl],	a
-	ld		a,		0
-	ldi		[hl],	a
-	ld		a,		50
-	ldi		[hl],	a
+;	ld		hl,		v_enemy_array
+;	ld		a,		1
+;	ldi		[hl],	a
+;	ld		a,		0
+;	ldi		[hl],	a
+;	ld		a,		50
+;	ldi		[hl],	a
 
-	ld		hl,		v_enemy_array + s_enemy_SIZEOF
-	ld		a,		1
-	ldi		[hl],	a
-	ld		a,		20
-	ldi		[hl],	a
-	ld		a,		80
-	ldi		[hl],	a
+;	ld		hl,		v_enemy_array + s_enemy_SIZEOF
+;	ld		a,		1
+;	ldi		[hl],	a
+;	ld		a,		20
+;	ldi		[hl],	a
+;	ld		a,		80
+;	ldi		[hl],	a
 
 startup:
 	; Set LCD
@@ -171,6 +176,7 @@ loop:
 	call	bullets_update
 	call	collisions_update
 
+	call	level_controller_update
 	call	game_manager_update
 
 	call	player_draw

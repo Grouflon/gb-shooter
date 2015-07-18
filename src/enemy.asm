@@ -15,6 +15,46 @@ enemy_init:
 	ld		[hl],	a
 	ret
 
+; ret hl	- free enemy address
+; ret a		- has found one
+enemy_find_free:
+	ld	hl,	v_enemy_array
+	ld	bc,	s_enemy_SIZEOF
+	ld	a,	ENEMIES_MAX
+.find_loop:
+	cp	0
+	jr	z,	.not_found
+	push	af
+	ld		a,	[hl]
+	cp		0
+	jr		z,	.found
+	pop		af
+	add	hl,	bc
+	dec	a
+	jr	.find_loop
+.found:
+	pop	af
+	ld	a,	1
+	ret
+.not_found:
+	ret
+
+; b	- Y coordinate
+; c	- X coordinate
+enemy_create:
+	push	bc
+	call	enemy_find_free
+	pop		bc
+	cp		0
+	jr		z,	.enemy_create_end
+	ld		a,		1
+	ldi		[hl],	a
+	ld		a,		b
+	ldi		[hl],	a
+	ld		a,		c
+	ld		[hl],	a
+.enemy_create_end:
+	ret
 
 enemies_init:
 	FOR		v_enemy_array, ENEMIES_MAX, s_enemy_SIZEOF, enemy_init
@@ -69,7 +109,7 @@ enemy_draw:
 
 	; Flags
 	inc		de
-	ld		a,		OAMF_PAL1
+	ld		a,		OAMF_PAL1|OAMF_YFLIP
 	ld		[de],	a
 	ret
 .off:
