@@ -6,6 +6,8 @@ __STRUCTS_DEF__	SET 1
 s_player_on		RB 1
 s_player_y		RB 1
 s_player_x		RB 1
+s_player_hcarry	RB 1
+s_player_vcarry	RB 1
 s_player_facing	RB 1
 s_player_SIZEOF	RB 0
 
@@ -16,6 +18,7 @@ s_bullet_on 	RB 1
 s_bullet_y		RB 1
 s_bullet_x		RB 1
 s_bullet_sprite	RB 1
+s_bullet_carry	RB 1
 s_bullet_facing	RB 1
 s_bullet_SIZEOF	RB 0
 

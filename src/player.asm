@@ -13,6 +13,9 @@ player_init:
 	ldi		[hl],	a
 	ld		a,		80
 	ldi		[hl],	a
+	ld		a,		0
+	ldi		[hl],	a
+	ldi		[hl],	a
 	ld		a,		PLAYER_FACING_UP
 	ld		[hl],	a
 	ret
@@ -24,6 +27,8 @@ player_reset:
 	ldi		[hl],	a
 	ldi		[hl],	a
 	ldi		[hl],	a
+	ldi		[hl],	a
+	ld		[hl],	a
 	ret
 
 
@@ -114,37 +119,70 @@ player_update:
 
 
 player_move_right:
+	ld		a,	[v_player + s_player_hcarry]
+	add		PLAYER_HSPEED
+	ld		d,	a
+	res		0,	a
+	SWP8	d,	a
+	sub		a,	d
+	ld		[v_player + s_player_hcarry],	a
+	rr		d
+
 	ld		a,	[v_player + s_player_x]
-	inc		a
+	add		a,	d
 	cp		160
-	ret		z
-	ld		[v_player + s_player_x],		a
-;	ld		a,								PLAYER_FACING_RIGHT
-;	ld		[v_player + s_player_facing],	a
+	jr		nc,	.out
+	ld		[v_player + s_player_x],	a
+	ret
+.out:
+	ld		a,	160
+	ld		[v_player + s_player_x],	a
 	ret
 
 
 
 player_move_left:
+	ld		a,	[v_player + s_player_hcarry]
+	add		PLAYER_HSPEED
+	ld		d,	a
+	res		0,	a
+	SWP8	d,	a
+	sub		a,	d
+	ld		[v_player + s_player_hcarry],	a
+	rr		d
+
 	ld		a,	[v_player + s_player_x]
+	sub		a,	d
 	cp		8
-	ret		z
-	dec		a
-	ld		[v_player + s_player_x],		a
-;	ld		a,								PLAYER_FACING_LEFT
-;	ld		[v_player + s_player_facing],	a
+	jr		c,	.out
+	ld		[v_player + s_player_x],	a
+	ret
+.out:
+	ld		a,	8
+	ld		[v_player + s_player_x],	a
 	ret
 
 
 
 player_move_up:
+	ld		a,	[v_player + s_player_vcarry]
+	add		PLAYER_VSPEED
+	ld		d,	a
+	res		0,	a
+	SWP8	d,	a
+	sub		a,	d
+	ld		[v_player + s_player_vcarry],	a
+	rr		d
+
 	ld		a,	[v_player + s_player_y]
+	sub		a,	d
 	cp		16
-	ret		z
-	dec		a
+	jr		c,	.out
 	ld		[v_player + s_player_y],	a
-;	ld		a,							PLAYER_FACING_UP
-;	ld		[v_player + s_player_facing],	a
+	ret
+.out:
+	ld		a,	16
+	ld		[v_player + s_player_y],	a
 	ret
 
 	

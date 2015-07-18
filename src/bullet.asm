@@ -13,8 +13,10 @@ bullet_init:
 	ldi		[hl],	a
 	ld		a,		BULLET_SPRITE	; Bullet sprite number
 	ldi		[hl],	a
+	ld		a,		0
+	ldi		[hl],	a	; Speed carry
 	ld		a,		BULLET_FACING_UP ; Bullet Facing
-	ldi		[hl],	a
+	ld		[hl],	a
 	ret
 
 bullets_init:
@@ -54,8 +56,11 @@ bullet_create:
 	;	X
 	ld		a,		b
 	ldi		[hl],	a
+	;	Carry
+	inc	hl
+	ld		a,		0
+	ldi		[hl],	a
 	;	Facing
-	inc		hl
 	pop		af
 	ld		[hl],	a
 	ret
@@ -80,7 +85,18 @@ bullet_update:
 	inc		hl
 	ld		c,	a		; X Position in c
 	inc		hl
-	ld		a,	[hl]	; Facing
+; carry
+	ld		a,	[hl]
+	add		BULLET_SPEED
+	ld		d,	a		; Carry in d
+	res		0,	a
+	SWP8	d,	a
+	sub		a,	d
+	ld		[hl],	a
+	rr		d
+	inc		hl
+; Facing
+	ld		a,	[hl]
 	cp		BULLET_FACING_LEFT
 	jr		z,	.b_move_left
 	cp		BULLET_FACING_RIGHT
@@ -90,16 +106,24 @@ bullet_update:
 	cp		BULLET_FACING_DOWN
 	jr		z,	.b_move_down
 .b_move_left
-	dec		c
+	ld		a,	c
+	sub		d
+	ld		c,	a
 	jr		.b_apply_movement
 .b_move_right
-	inc		c
+	ld		a,	c
+	add		d
+	ld		c,	a
 	jr		.b_apply_movement
 .b_move_up
-	dec		b
+	ld		a,	b
+	sub		d
+	ld		b,	a
 	jr		.b_apply_movement
 .b_move_down
-	inc		b
+	ld		a,	b
+	add		d
+	ld		b,	a
 
 .b_apply_movement	
 	pop		hl
@@ -157,6 +181,8 @@ bullet_reset:
 	ld		a,		0
 	ldi		[hl],	a
 	ldi		[hl],	a
+	ldi		[hl],	a
+	inc		hl
 	ld		[hl],	a
 	ret
 
