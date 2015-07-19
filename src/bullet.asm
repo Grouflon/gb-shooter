@@ -229,5 +229,47 @@ bullets_draw:
 	OAM_FOR	v_bullet_array, OAM_BULLETS, BULLETS_MAX, s_bullet_SIZEOF, bullet_draw
 	ret
 
+BULLETS_DRAW:	MACRO
+
+B_INDEX		SET	0
+
+	REPT	BULLETS_MAX
+
+B_OFFSET	SET	B_INDEX*s_bullet_SIZEOF
+B_DEST		SET OAM_BULLETS + B_INDEX*4
+
+	ld	a,	[v_bullet_array + B_OFFSET + s_bullet_on]
+	cp	0
+	jp	z,	.off\@
+
+	; Y pos
+	ld	a,			[v_bullet_array + B_OFFSET + s_bullet_y]
+	ld	[B_DEST],	a
+
+	; X pos
+	ld	a,			[v_bullet_array + B_OFFSET + s_bullet_x]
+	ld	[B_DEST+1],	a
+
+	; Sprite
+	ld	a,			BULLET_SPRITE
+	ld	[B_DEST+2],	a
+
+	; Flags
+	ld	a,			0
+	ld	[B_DEST+3],	a
+	jr	.end\@
+
+.off\@:
+	ld	a,			0
+	ld	[B_DEST],	a
+	ld	[B_DEST+1],	a
+.end\@:
+	
+B_INDEX		SET B_INDEX+1	
+
+	ENDR	
+PURGE	B_INDEX, B_OFFSET, B_DEST
+ENDM
+
 
 ENDC    ; __BULLET_DEF__

@@ -132,5 +132,46 @@ enemies_draw:
 	OAM_FOR	v_enemy_array, OAM_ENEMIES, ENEMIES_MAX, s_enemy_SIZEOF, enemy_draw
 	ret
 
+ENEMIES_DRAW:	MACRO
+
+E_INDEX		SET 0
+
+	REPT	ENEMIES_MAX
+
+E_OFFSET	SET	E_INDEX*s_enemy_SIZEOF
+E_DEST		SET	OAM_ENEMIES + E_INDEX*4
+
+	ld	a,	[v_enemy_array + E_OFFSET + s_enemy_on]
+	cp	0
+	jr	z,	.off\@
+
+	; Y Pos
+	ld	a,			[v_enemy_array + E_OFFSET + s_enemy_y]
+	ld	[E_DEST],	a
+
+	; X Pos	
+	ld	a,			[v_enemy_array + E_OFFSET + s_enemy_x]
+	ld	[E_DEST+1],	a
+
+	; Sprite	
+	ld	a,			ENEMY_SPRITE
+	ld	[E_DEST+2],	a
+
+	; Flags
+	ld	a,			OAMF_PAL1|OAMF_YFLIP
+	ld	[E_DEST+3],	a
+	jr	.end\@
+
+.off\@:
+	ld	a,			0
+	ld	[E_DEST],	a
+	ld	[E_DEST+1],	a
+.end\@:
+
+E_INDEX		SET E_INDEX+1
+	ENDR
+PURGE	E_INDEX, E_OFFSET, E_DEST
+ENDM
+
 
 ENDC    ; __ENEMY_DEF__

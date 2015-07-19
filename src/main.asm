@@ -169,13 +169,15 @@ loop:
 	call	game_manager_update
 
 	call	player_draw
-	call	bullets_draw
-	call	enemies_draw
+;	call	bullets_draw
+	BULLETS_DRAW
+	;call	enemies_draw
+	ENEMIES_DRAW
 
 	
 	call	wait_vblank
 	; can touch vram now
-	call	game_manager_draw
 	call	background_controller_update
+	call	game_manager_draw
 
 	jp		loop
