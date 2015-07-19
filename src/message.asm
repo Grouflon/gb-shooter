@@ -1,0 +1,3 @@
+IF  !DEF(__BULLET_DEF__)
+__BULLET_DEF__ SET 1
+ENDC    ; __BULLET_DEF__

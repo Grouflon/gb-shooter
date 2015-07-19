@@ -40,11 +40,11 @@ INCLUDE "background_controller.asm"
 SECTION "graphics",	DATA
 graphics:
 sprites:
-	INCLUDE "data/tileset_0.z80"
+	INCLUDE "data/sprites_tileset.z80"
 sprites_end:
-font:
-	INCLUDE "data/font.asm"
-font_end:
+background:
+	INCLUDE "data/bg_tileset.z80"
+background_end:
 graphics_end:
 
 SECTION "backgrounds", DATA
@@ -63,6 +63,7 @@ SECTION	"main_vars",	BSS
 
 SECTION "vblank_interrupt",           HOME[$0040]
 	call	dma
+	call	vblank_stuff
     reti
 
 ; Entry point
@@ -82,16 +83,16 @@ initialize:
 
 	call	disable_lcd
 
-	; Load sprites data
+	; Load sprites tileset
 	ld		de,		_VRAM
 	ld		bc,		sprites_end - sprites
 	ld		hl,		sprites
 	call	mem_copy
 
-	; Load font data
-	ld		de,		FONT_TILES
-	ld		bc,		font_end - font
-	ld		hl,		font
+	; Load background & window tileset
+	ld		de,		$8800
+	ld		bc,		background_end - background
+	ld		hl,		background
 	call	mem_copy
 
 game_init:	
@@ -138,6 +139,10 @@ game_init:
 	ld		bc,		cloud_bg_end - cloud_bg
 	ld		hl,		cloud_bg
 	call	mem_copy
+
+	; Position window
+	ld	a,		132
+	ld	[rWY],	a
 	
 
 	call	player_init
@@ -149,7 +154,7 @@ game_init:
 
 startup:
 	; Set LCD
-	ld	a,			LCDCF_ON|LCDCF_BG8800|LCDCF_BG9800|LCDCF_BGON|LCDCF_OBJ8|LCDCF_OBJON
+	ld	a,			LCDCF_ON|LCDCF_BG8800|LCDCF_BG9800|LCDCF_BGON|LCDCF_OBJ8|LCDCF_OBJON|LCDCF_WIN9C00|LCDCF_WINON
 	ld	[rLCDC],	a
 
 	; Enable interrupts
@@ -174,10 +179,13 @@ loop:
 	;call	enemies_draw
 	ENEMIES_DRAW
 
-	
-	call	wait_vblank
+	halt	
+	;call	wait_vblank
 	; can touch vram now
-	call	background_controller_update
-	call	game_manager_draw
 
 	jp		loop
+
+vblank_stuff:
+	call	background_controller_update
+	call	game_manager_draw
+	ret
