@@ -35,23 +35,26 @@ INCLUDE "enemy.asm"
 INCLUDE "collisions.asm"
 INCLUDE "game_manager.asm"
 INCLUDE "level_controller.asm"
+INCLUDE "background_controller.asm"
 
 SECTION "graphics",	DATA
 graphics:
 sprites:
-INCLUDE "data/sprites.asm"
+	INCLUDE "data/tileset_0.z80"
 sprites_end:
-tiles:
-INCLUDE "data/tiles.asm"
-tiles_end:
 font:
-INCLUDE "data/font.asm"
+	INCLUDE "data/font.asm"
 font_end:
 graphics_end:
 
+SECTION "backgrounds", DATA
+cloud_bg:
+	INCLUDE "data/cloudsmap.z80"
+cloud_bg_end:
+
 SECTION	"levels", DATA
 level:
-INCLUDE "data/level.asm"
+	INCLUDE "data/level.asm"
 level_end:
 
 
@@ -83,12 +86,6 @@ initialize:
 	ld		de,		_VRAM
 	ld		bc,		sprites_end - sprites
 	ld		hl,		sprites
-	call	mem_copy
-
-	; Load tiles data
-	ld		de,		$8800
-	ld		bc,		tiles_end - tiles
-	ld		hl,		tiles
 	call	mem_copy
 
 	; Load font data
@@ -136,27 +133,19 @@ game_init:
 	ld		l,		0
 	call	mem_fill
 
+	; Load background
+	ld		de,		_SCRN0
+	ld		bc,		cloud_bg_end - cloud_bg
+	ld		hl,		cloud_bg
+	call	mem_copy
+	
+
 	call	player_init
 	call	enemies_init
 	call	bullets_init
 	call	game_manager_init
 	call	level_controller_init
-
-;	ld		hl,		v_enemy_array
-;	ld		a,		1
-;	ldi		[hl],	a
-;	ld		a,		0
-;	ldi		[hl],	a
-;	ld		a,		50
-;	ldi		[hl],	a
-
-;	ld		hl,		v_enemy_array + s_enemy_SIZEOF
-;	ld		a,		1
-;	ldi		[hl],	a
-;	ld		a,		20
-;	ldi		[hl],	a
-;	ld		a,		80
-;	ldi		[hl],	a
+	call	background_controller_init
 
 startup:
 	; Set LCD
@@ -187,5 +176,6 @@ loop:
 	call	wait_vblank
 	; can touch vram now
 	call	game_manager_draw
+	call	background_controller_update
 
 	jp		loop
