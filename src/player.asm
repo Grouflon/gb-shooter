@@ -189,7 +189,7 @@ player_move_up:
 
 player_move_down:
 	ld		a,	[v_player + s_player_y]
-	cp		152
+	cp		143
 	ret		z
 	inc		a
 	ld		[v_player + s_player_y],		a

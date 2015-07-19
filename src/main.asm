@@ -37,6 +37,7 @@ INCLUDE "collisions.asm"
 INCLUDE "game_manager.asm"
 INCLUDE "level_controller.asm"
 INCLUDE "background_controller.asm"
+INCLUDE "score_controller.asm"
 
 SECTION "graphics",	DATA
 graphics:
@@ -62,10 +63,14 @@ level_end:
 SECTION	"main_vars",	BSS
 
 
-SECTION "vblank_interrupt",           HOME[$0040]
+SECTION "vblank_interrupt",         HOME[$0040]
 	call	dma
 	call	vblank_stuff
     reti
+
+SECTION "lcdc_status_interrupt",	HOME[$0048]
+	call	lcdc_interrupt
+	reti
 
 ; Entry point
 SECTION "main",	HOME[$0100]
@@ -152,6 +157,7 @@ game_init:
 	call	game_manager_init
 	call	level_controller_init
 	call	background_controller_init
+	call	score_controller_init
 
 startup:
 	; Set LCD
@@ -159,11 +165,16 @@ startup:
 	ld	[rLCDC],	a
 
 	; Enable interrupts
-	ld	a,		IEF_VBLANK
+	ld	a,		0
+	ld	[rIF],	a
+	ld	a,		IEF_VBLANK|IEF_LCDC
 	ld	[rIE],	a
+	ld	a,		STATF_MODE00
+	ld	[rSTAT],a
 	ei
 
 loop:
+
 	call	update_input
 
 	call	player_update
@@ -174,6 +185,10 @@ loop:
 	call	level_controller_update
 	call	game_manager_update
 
+	ld		a,	1
+	call	score_add
+	call	score_update
+
 	call	player_draw
 ;	call	bullets_draw
 	BULLETS_DRAW
@@ -181,13 +196,36 @@ loop:
 	ENEMIES_DRAW
 	call	game_manager_draw
 
-	halt	
+.wait_frame_end:
+	halt
+	ld	a,	[rLY]
+	cp	144
+	jr	c,	.wait_frame_end
 
 	jp		loop
 
+lcdc_interrupt:
+	push	af
+	call	hblank_stuff
+	pop		af
+	ret
+
+hblank_stuff:
+	ld	a,	[rLY]
+	cp	135
+	ret	c
+	ld	a,	[rLCDC]
+	res	1,	a
+	ld	[rLCDC], a
+	ret
+
 vblank_stuff:
+	ld	a,	[rLCDC]
+	set	1,	a
+	ld	[rLCDC], a
 	call	background_controller_update
 	call	message_draw
+	call	score_draw
 	ld		a,		8
 	ld		[rWX],	a
 	ret
