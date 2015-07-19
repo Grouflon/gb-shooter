@@ -64,10 +64,11 @@ game_manager_draw:
 	jr	z,	.lose
 	ret
 .win:
-	LOG	"YOU WIN", _SCRN0 + (32*8) + 6
+;	LOG	"YOU WIN", _SCRN0 + (32*8) + 6
 	ret
 .lose
-	LOG	"YOU LOSE", _SCRN0 + (32*8) + 6
+;	LOG	"YOU LOSE", _SCRN0 + (32*8) + 6
+	MESSAGE_SET "YOU LOSE"
 	ret
 	
 

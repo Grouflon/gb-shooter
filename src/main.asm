@@ -29,6 +29,7 @@ BREAK:	MACRO
 INCLUDE "consts.asm"
 INCLUDE "structs.asm"
 INCLUDE "ram_map.asm"
+INCLUDE "message.asm"
 INCLUDE "player.asm"
 INCLUDE "bullet.asm"
 INCLUDE "enemy.asm"
@@ -141,10 +142,10 @@ game_init:
 	call	mem_copy
 
 	; Position window
-	ld	a,		132
+	ld	a,		135
 	ld	[rWY],	a
 	
-
+	call	message_init
 	call	player_init
 	call	enemies_init
 	call	bullets_init
@@ -178,14 +179,15 @@ loop:
 	BULLETS_DRAW
 	;call	enemies_draw
 	ENEMIES_DRAW
+	call	game_manager_draw
 
 	halt	
-	;call	wait_vblank
-	; can touch vram now
 
 	jp		loop
 
 vblank_stuff:
 	call	background_controller_update
-	call	game_manager_draw
+	call	message_draw
+	ld		a,		8
+	ld		[rWX],	a
 	ret

@@ -13,7 +13,10 @@ background_controller_update:
 	ld	a,	[rSCY]
 	dec	a
 	ld	[rSCY],	a
-	
+
+	ld	a,	[v_player + s_player_on] 
+	cp	0
+	ret	z
 	ld	a,	[v_player + s_player_x]
 	srl	a
 	srl	a
