@@ -38,15 +38,13 @@ player_draw:
 .update_sprite
 	; Y
 	ld	a,		[v_player + s_player_y]
-	ld	[hl],	a
+	ldi	[hl],	a
 
 	; X
-	inc	hl
 	ld	a,		[v_player + s_player_x]
-	ld	[hl],	a
+	ldi	[hl],	a
 
 	; Sprite number
-	inc	hl
 	ld	a,	[v_player + s_player_facing]
 	cp	PLAYER_FACING_LEFT
 	jr	z, .sprite_horizontal
@@ -62,10 +60,9 @@ player_draw:
 .sprite_vertical
 	ld	a,	PLAYER_V_SPRITE
 .sprite_number_end
-	ld	[hl], a
+	ldi	[hl], a
 
 	; Attributes
-	inc	hl
 	ld	b,	OAMF_PAL0
 	ld	a,	[v_player + s_player_facing]
 	ld	c,	a

@@ -59,6 +59,7 @@ level_controller_update:
 	cp		0
 	jr		z,	.spawn_next
 	push	hl
+	ld		d,	a
 	call	enemy_create
 	pop		hl
 .spawn_next:

@@ -7,23 +7,8 @@ INCLUDE "utils/input.asm"
 INCLUDE "utils/log.asm"
 INCLUDE "utils/macros.asm"
 
-SECTION "break",	CODE
-brk:	push	hl
-		ld		hl, 2
-		add		hl,	sp
-		push	af
-		ld		a,	[hl]
-		LOGR8H	a,	_SCRN0+2
-		inc		hl
-		ld		a,	[hl]
-		LOGR8H	a,	_SCRN0
-		pop		af
-		pop		hl
-		ret
-
-
 BREAK:	MACRO
-		call	brk
+		ld	b,b
 		ENDM
 
 INCLUDE "consts.asm"
@@ -178,7 +163,8 @@ loop:
 	call	update_input
 
 	call	player_update
-	call	enemies_update
+	ENEMIES_UPDATE
+;	call	enemies_update
 	call	bullets_update
 	call	collisions_update
 

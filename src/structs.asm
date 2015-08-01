@@ -28,7 +28,11 @@ s_bullet_SIZEOF	RB 0
 s_enemy_on		RB 1
 s_enemy_y		RB 1
 s_enemy_x		RB 1
-s_enemy_sprite	RB 1
+s_enemy_type	RB 1
+s_enemy_yspeed	RB 1
+s_enemy_xspeed	RB 1
+s_enemy_ycarry	RB 1
+s_enemy_xcarry	RB 1
 s_enemy_SIZEOF	RB 0
 
 

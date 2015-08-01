@@ -7,12 +7,12 @@ SECTION "enemies", CODE
 ; hl	- struct address
 enemy_init:
 	ld		a,		0
-	ldi		[hl],	a
-	ld		a,		0
-	ldi		[hl],	a
-	ldi		[hl],	a
-	ld		a,		ENEMY_SPRITE
-	ld		[hl],	a
+	ldi		[hl],	a	;On
+	ldi		[hl],	a	;Y
+	ldi		[hl],	a	;X
+	ldi		[hl],	a	;type
+	ldi		[hl],	a	;ycarry
+	ld		[hl],	a	;xcarry
 	ret
 
 ; ret hl	- free enemy address
@@ -41,6 +41,7 @@ enemy_find_free:
 
 ; b	- Y coordinate
 ; c	- X coordinate
+; d - type
 enemy_create:
 	push	bc
 	call	enemy_find_free
@@ -48,11 +49,34 @@ enemy_create:
 	cp		0
 	jr		z,	.enemy_create_end
 	ld		a,		1
-	ldi		[hl],	a
+	ldi		[hl],	a	; On
 	ld		a,		b
-	ldi		[hl],	a
+	ldi		[hl],	a	; Y
 	ld		a,		c
-	ld		[hl],	a
+	ldi		[hl],	a	; X
+	ld		a,		d
+	ldi		[hl],	a	; enemy_type
+	cp		ENEMY_TYPE_STD
+	jr		z,		.enemy_type_std
+	cp		ENEMY_TYPE_SLOW
+	jr		z,		.enemy_type_slow
+.enemy_type_dash:
+.enemy_type_slow:
+	ld		a,		ENEMY_SLOW_YSPEED
+	ldi		[hl],	a
+	ld		a,		ENEMY_SLOW_XSPEED
+	ldi		[hl],	a
+
+.enemy_type_std:
+	ld		a,		ENEMY_STD_YSPEED
+	ldi		[hl],	a
+	ld		a,		ENEMY_STD_XSPEED
+	ldi		[hl],	a
+
+.enemy_create_carry:
+	ld		a,		0
+	ldi		[hl],	a	; enemy_ycarry
+	ld		[hl],	a	; enemy_xcarry
 .enemy_create_end:
 	ret
 
@@ -61,62 +85,121 @@ enemies_init:
 	ret
 
 
-enemies_update:
-	FOR		v_enemy_array, ENEMIES_MAX, s_enemy_SIZEOF, enemy_update
-	ret
+;enemies_update:
+;	FOR		v_enemy_array, ENEMIES_MAX, s_enemy_SIZEOF, enemy_update
+;	ret
 
 
 ; hl	- struct address
-enemy_update:
-	push	hl
-	ld	bc,	s_enemy_y
-	add	hl,	bc
-	ld	a,	[hl]
-	inc	a
-	cp	161
-	jr	nc,	.out
-	ld	[hl],	a
-	pop	hl
-	ret
-.out:
-	pop	hl
-	call	enemy_reset
-	ret
+;enemy_update:
+;	push	hl
+;	ld	bc,	s_enemy_y
+;	add	hl,	bc
+;	ld	a,	[hl]
+;	inc	a
+;	cp	161
+;	jr	nc,	.out
+;	ld	[hl],	a
+;	pop	hl
+;	ret
+;.out:
+;	pop	hl
+;	call	enemy_reset
+;	ret
 
+ENEMIES_UPDATE:	MACRO
 
-enemy_draw:
-	; don't draw if disabled
-	ld		a,		[hl]
+E_INDEX		SET 0
+
+	REPT	ENEMIES_MAX
+
+E_OFFSET	SET	E_INDEX*s_enemy_SIZEOF
+E_DEST		SET	OAM_ENEMIES + E_INDEX*4
+
+; Skip if off
+	ld		a,	[v_enemy_array + E_OFFSET + s_enemy_on]
 	cp		0
-	jr		z,		.off
+	jr		z,	.enemy_update_end\@
+
+; Apply Y movement
+	ld		a,	[v_enemy_array + E_OFFSET + s_enemy_yspeed]
+	ld		c,	a
+	ld		a,	[v_enemy_array + E_OFFSET + s_enemy_ycarry]
+	add		c
+	ld		b,	a
+	res		0,	a
+	SWP8	b,	a
+	sub		a,	b
+	ld		[v_enemy_array + E_OFFSET + s_enemy_ycarry],	a
+	rr		b
+	ld		a,	[v_enemy_array + E_OFFSET + s_enemy_y]
+	add		a,	b
+	cp		161
+	jr		nc,	.enemy_out\@
+	ld		[v_enemy_array + E_OFFSET + s_enemy_y],	a
+	jr		.enemy_update_end\@
+
+; Apply X movement
+	ld		a,	[v_enemy_array + E_OFFSET + s_enemy_xspeed]
+	ld		c,	a
+	ld		a,	[v_enemy_array + E_OFFSET + s_enemy_xcarry]
+	add		c
+	ld		b,	a
+	res		0,	a
+	SWP8	b,	a
+	sub		a,	b
+	ld		[v_enemy_array + E_OFFSET + s_enemy_xcarry],	a
+	rr		b
+	ld		a,	[v_enemy_array + E_OFFSET + s_enemy_x]
+	add		a,	b
+	ld		[v_enemy_array + E_OFFSET + s_enemy_y],	a
+	jr		.enemy_update_end\@
+
+.enemy_out\@
+	ld		hl,	v_enemy_array+E_OFFSET
+	call	enemy_reset
+
+.enemy_update_end\@
+
+E_INDEX		SET E_INDEX+1
+	ENDR
+PURGE	E_INDEX, E_OFFSET, E_DEST
+ENDM
+
+
+;enemy_draw:
+	; don't draw if disabled
+;	ld		a,		[hl]
+;	cp		0
+;	jr		z,		.off
 
 	; Y pos
-	inc		hl
-	ld		a,		[hl]
-	ld		[de],	a
+;	inc		hl
+;	ld		a,		[hl]
+;	ld		[de],	a
 
 	; X pos
-	inc		hl
-	inc		de
-	ld		a,		[hl]
-	ld		[de],	a
+;	inc		hl
+;	inc		de
+;	ld		a,		[hl]
+;	ld		[de],	a
 
 	; Sprite number
-	inc		hl
-	inc		de
-	ld		a,		[hl]
-	ld		[de],	a
+;	inc		hl
+;	inc		de
+;	ld		a,		[hl]
+;	ld		[de],	a
 
 	; Flags
-	inc		de
-	ld		a,		OAMF_PAL1|OAMF_YFLIP
-	ld		[de],	a
-	ret
-.off:
-	ld		a,		0
-	ld		[de],	a
-	inc		de
-	ld		[de],	a
+;	inc		de
+;	ld		a,		OAMF_PAL1|OAMF_YFLIP
+;	ld		[de],	a
+;	ret
+;.off:
+;	ld		a,		0
+;	ld		[de],	a
+;	inc		de
+;	ld		[de],	a
 
 
 ; hl	- strcut address
@@ -128,9 +211,9 @@ enemy_reset:
 	ret
 
 
-enemies_draw:
-	OAM_FOR	v_enemy_array, OAM_ENEMIES, ENEMIES_MAX, s_enemy_SIZEOF, enemy_draw
-	ret
+;enemies_draw:
+;	OAM_FOR	v_enemy_array, OAM_ENEMIES, ENEMIES_MAX, s_enemy_SIZEOF, enemy_draw
+;	ret
 
 ENEMIES_DRAW:	MACRO
 
