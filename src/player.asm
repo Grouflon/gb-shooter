@@ -17,6 +17,8 @@ player_init:
 	ldi		[hl],	a
 	ldi		[hl],	a
 	ld		a,		PLAYER_FACING_UP
+	ldi		[hl],	a
+	ld		a,		PLAYER_SHOOTINTERVAL
 	ld		[hl],	a
 	ret
 
@@ -24,6 +26,7 @@ player_init:
 player_reset:
 	ld		hl,		v_player
 	ld		a,		0
+	ldi		[hl],	a
 	ldi		[hl],	a
 	ldi		[hl],	a
 	ldi		[hl],	a
@@ -107,10 +110,19 @@ player_update:
 	and		PADF_DOWN
 	call	nz,	player_move_down
 
-	ld		a,	[INPUT_PRESSED]
+	ld		a,	[v_player + s_player_firedelay]
+	cp		PLAYER_SHOOTINTERVAL
+	jr		nc,	.fire_input
+	inc		a
+	ld		[v_player + s_player_firedelay],	a
+	jr		.update_end
+
+.fire_input:
+	ld		a,	[INPUT]
 	and		PADF_B
 	call	nz,	player_fire_bullet
 
+.update_end
 	ret
 
 
@@ -196,6 +208,8 @@ player_move_down:
 
 
 player_fire_bullet:
+	ld		a,	0
+	ld		[v_player + s_player_firedelay],	a
 	ld		a,	[v_player + s_player_x]
 	ld		b,	a
 	ld		a,	[v_player + s_player_y]

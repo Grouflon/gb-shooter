@@ -61,16 +61,20 @@ enemy_create:
 	cp		ENEMY_TYPE_SLOW
 	jr		z,		.enemy_type_slow
 .enemy_type_dash:
+	ld		a,		ENEMY_DASH_BASESPEED
+	ldi		[hl],	a
+	ld		a,		0
+	ldi		[hl],	a
 .enemy_type_slow:
 	ld		a,		ENEMY_SLOW_YSPEED
 	ldi		[hl],	a
-	ld		a,		ENEMY_SLOW_XSPEED
+	ld		a,		0
 	ldi		[hl],	a
 
 .enemy_type_std:
 	ld		a,		ENEMY_STD_YSPEED
 	ldi		[hl],	a
-	ld		a,		ENEMY_STD_XSPEED
+	ld		a,		0
 	ldi		[hl],	a
 
 .enemy_create_carry:
@@ -121,6 +125,33 @@ E_DEST		SET	OAM_ENEMIES + E_INDEX*4
 	cp		0
 	jr		z,	.enemy_update_end\@
 
+	ld		a,	[v_enemy_array + E_OFFSET + s_enemy_type]
+	cp		ENEMY_TYPE_DASH
+	jr		z,	.enemy_dash_update\@
+	jr		.enemy_update_common\@
+
+.enemy_dash_update\@
+; cant dash until reached y threshold
+	ld		a,	[v_enemy_array + E_OFFSET + s_enemy_y]
+	cp		ENEMY_DASH_THRESHOLD
+	jr		c,	.enemy_update_common\@
+
+; Ignite dash when player is in front of him
+	ld		a,	[v_player + s_player_x]
+	add		PLAYER_WIDTH
+	ld		b,	a
+	ld		a,	[v_enemy_array + E_OFFSET + s_enemy_x]
+	cp		b
+	jp		nc,	.enemy_update_common\@
+	add		ENEMY_WIDTH
+	SWP8	a,	b
+	sub		PLAYER_WIDTH
+	cp		b
+	jp		nc,	.enemy_update_common\@
+	ld		a,	ENEMY_DASH_DASHSPEED
+	ld		[v_enemy_array + E_OFFSET + s_enemy_yspeed], a
+
+.enemy_update_common\@
 ; Apply Y movement
 	ld		a,	[v_enemy_array + E_OFFSET + s_enemy_yspeed]
 	ld		c,	a

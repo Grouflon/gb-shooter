@@ -60,7 +60,7 @@ SECTION "lcdc_status_interrupt",	HOME[$0048]
 ; Entry point
 SECTION "main",	HOME[$0100]
 main:
-    nop
+	nop
 	jp initialize
 
 	ROM_HEADER	"SPACE SHOOTER", ROM_NOMBC, ROM_SIZE_32KBYTE, RAM_SIZE_0KBYTE
@@ -96,7 +96,7 @@ game_init:
 	ld	[rBGP],		a
 	ld	a,			%11001000
 	ld	[rOBP0],	a
-	ld	a,			%00011011
+	ld	a,			%11011011
 	ld	[rOBP1],	a
 
 	; Init scroll

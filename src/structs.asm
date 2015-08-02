@@ -9,6 +9,7 @@ s_player_x		RB 1
 s_player_hcarry	RB 1
 s_player_vcarry	RB 1
 s_player_facing	RB 1
+s_player_firedelay RB 1
 s_player_SIZEOF	RB 0
 
 
