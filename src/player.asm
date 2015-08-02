@@ -216,6 +216,7 @@ player_fire_bullet:
 	ld		c,	a
 	ld		a,	[v_player + s_player_facing]
 	call	bullet_create
+	call	sound_shoot
 	ret
 
 

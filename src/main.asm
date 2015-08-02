@@ -6,6 +6,7 @@ INCLUDE "utils/display.asm"
 INCLUDE "utils/input.asm"
 INCLUDE "utils/log.asm"
 INCLUDE "utils/macros.asm"
+INCLUDE "utils/sound.asm"
 
 BREAK:	MACRO
 		ld	b,b
@@ -23,6 +24,7 @@ INCLUDE "game_manager.asm"
 INCLUDE "level_controller.asm"
 INCLUDE "background_controller.asm"
 INCLUDE "score_controller.asm"
+INCLUDE "sound_controller.asm"
 
 SECTION "graphics",	DATA
 graphics:
@@ -44,18 +46,7 @@ level:
 	INCLUDE "data/level.asm"
 level_end:
 
-
-SECTION "notes", DATA
-notes:
-	DB	$0A, $42, $72, $89, $B2, $D6, $F7
-notes_end:
-
 SECTION	"main_vars",	BSS
-
-NOTE		DS 1
-TEMPO_CNT	DS 1
-
-TEMPO	EQU	200
 
 SECTION "vblank_interrupt",         HOME[$0040]
 	call	dma
@@ -175,25 +166,8 @@ startup:
 	ld	a,			%01110111
 	ld	[rNR50],	a
 	; init outputs
-	ld	a,			%00110011
+	ld	a,			%00010001
 	ld	[rNR51],	a
-
-	; channel 2
-	; cycle pattern at 50% and longitude at 63
-	; time = (256-lgtd)*(1/256) seconds
-	ld	a,			%00000011
-	ld	[rNR21],	a
-	; envelope
-	ld	a,			%11110111
-	ld	[rNR22],	a
-	; Lgt enable & frequency
-	ld	a,			%01000000
-	ld	[rNR24],	a
-
-	ld	a,		0
-	ld	[NOTE],	a
-	ld	a,		TEMPO
-	ld	[TEMPO_CNT], a
 
 loop:
 
@@ -215,52 +189,6 @@ loop:
 	BULLETS_DRAW
 	ENEMIES_DRAW
 	call	game_manager_draw
-
-
-	ld	a,	[TEMPO_CNT]
-	cp	a,	TEMPO
-	jr	z,	.play_note
-	inc	a
-	ld	[TEMPO_CNT], a
-	jr	.wait_frame_end
-.play_note:
-	ld	a,	0
-	ld	[TEMPO_CNT],	a
-
-	ld	a,	%00111111
-	ld	[rNR10],	a
-
-	ld	a,	%00111111
-	ld	[rNR11],	a
-
-	ld	a,	%11110111
-	ld	[rNR12],	a
-
-	ld	a,	$A0
-	ld	[rNR13],	a
-	ld	a,	%11000111
-	ld	[rNR14],	a
-
-;	ld	a,	[NOTE]
-;	ld	c,	a
-;	ld	b,	0
-;	ld	hl,	notes
-;	add	hl,	bc
-;	ld	a,	[hl]
-;	ld	[rNR23],	a
-;	ld	a,	%11000000
-;	ld	[rNR24],	a
-
-;	ld	a,	c
-;	inc	a
-;	cp	a,	notes_end-notes
-;	jr	z,	.reset_note
-;	ld	[NOTE],	a
-;	jr	.wait_frame_end
-;.reset_note:
-;	ld	a,	0
-;	ld	[NOTE],	a
-
 
 .wait_frame_end:
 	halt
