@@ -37,10 +37,10 @@ bullet_enemy_collision:
 	ld		d,	[hl]
 	add		3	; bullet is smaller than 8*8 sprite
 	SWP8	a,	d
-	add		ENEMY_HEIGHT
+	add		ENEMY_HEIGHT-1
 	cp		d
 	jr		c,	.end
-	sub		ENEMY_HEIGHT
+	sub		ENEMY_HEIGHT-2
 	SWP8	a,	d
 	add		2
 	cp		d
@@ -52,10 +52,10 @@ bullet_enemy_collision:
 	ld		d,	[hl]
 	add		3	; bullet is smaller than 8*8 sprite
 	SWP8	a,	d
-	add		ENEMY_WIDTH
+	add		ENEMY_WIDTH-1
 	cp		d
 	jr		c,	.end
-	sub		ENEMY_WIDTH
+	sub		ENEMY_WIDTH-2
 	SWP8	a,	d
 	add		2
 	cp		d
@@ -86,10 +86,10 @@ player_enemy_collision:
 	ld		a,	[v_player + s_player_y]
 	ld		b,	a
 	ld		a,	[hl]
-	add		ENEMY_HEIGHT
+	add		ENEMY_HEIGHT-1
 	cp		b
 	ret		c
-	sub		ENEMY_HEIGHT
+	sub		ENEMY_HEIGHT-2
 	SWP8	a,	b
 	add		PLAYER_HEIGHT
 	cp		b
@@ -99,10 +99,10 @@ player_enemy_collision:
 	ld		a,	[v_player + s_player_x]
 	ld		b,	a
 	ld		a,	[hl]
-	add		ENEMY_WIDTH
+	add		ENEMY_WIDTH-1
 	cp		b
 	ret		c
-	sub		ENEMY_WIDTH
+	sub		ENEMY_WIDTH-2
 	SWP8	a,	b
 	add		PLAYER_WIDTH
 	cp		b

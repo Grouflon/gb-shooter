@@ -11,7 +11,7 @@ player_init:
 	ldi		[hl],	a
 	ld		a,		140
 	ldi		[hl],	a
-	ld		a,		80
+	ld		a,		88
 	ldi		[hl],	a
 	ld		a,		0
 	ldi		[hl],	a
