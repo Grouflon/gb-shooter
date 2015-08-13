@@ -143,6 +143,7 @@ game_init:
 	call	level_controller_init
 	call	background_controller_init
 	call	score_controller_init
+	call	sound_controller_init
 
 startup:
 	; Set LCD
@@ -184,6 +185,7 @@ loop:
 	ld		a,	1
 	call	score_add
 	call	score_update
+	call	sound_controller_update
 
 	call	player_draw
 	BULLETS_DRAW
