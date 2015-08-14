@@ -159,15 +159,7 @@ startup:
 	ei
 
 ; MOUSIC
-	; enable sound system
-	ld	a,			%10000000
-	ld	[rNR52],	a
-	; init volumes, both max
-	ld	a,			%01110111
-	ld	[rNR50],	a
-	; init outputs
-	ld	a,			%00010001
-	ld	[rNR51],	a
+	call	sound_init
 
 loop:
 

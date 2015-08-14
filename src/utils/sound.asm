@@ -1,15 +1,25 @@
 IF  !DEF(__SOUND_DEF__)
 __SOUND_DEF__ SET 1
 
-CH1_SWEEP:	MACRO
-	ld	a,	(\1*16) | (\2*8) | \3
-	ld	[rNR10],	a
-ENDM
-
 WAVEP_1_8	EQU %00
 WAVEP_1_4	EQU %01
 WAVEP_1_2	EQU %10
 WAVEP_3_4	EQU %11
+
+WAVEMODE_MUTE	EQU	%00
+WAVEMODE_NOP	EQU	%01
+WAVEMODE_SHIFT1	EQU	%10
+WAVEMODE_SHIFT2	EQU	%11
+
+
+;****************************
+;*         CHANNEL 1        *
+;****************************
+
+CH1_SWEEP:	MACRO
+	ld	a,	(\1*16) | (\2*8) | \3
+	ld	[rNR10],	a
+ENDM
 
 CH1_LEN:	MACRO
 	ld	a,	(\1*64) | -(\2-63)
@@ -24,11 +34,6 @@ ENDM
 CH1_PLAY:	MACRO
 GB_FREQ		EQU	(2048.0 - DIV(131072.0, \1))>>16
 
-	PRINTV	\1
-	PRINTV	GB_FREQ
-	PRINTV	$FF & GB_FREQ
-	PRINTV	GB_FREQ >> 8
-
 	ld	a,	$FF & GB_FREQ
 	ld	[rNR13],	a
 	ld	a,	(GB_FREQ >> 8) | (\2 * 64) | %10000000
@@ -36,6 +41,64 @@ GB_FREQ		EQU	(2048.0 - DIV(131072.0, \1))>>16
 
 PURGE	GB_FREQ
 ENDM
+
+;****************************
+;*         CHANNEL 2        *
+;****************************
+
+CH2_LEN:	MACRO
+	ld	a,	(\1*64) | -(\2-63)
+	ld	[rNR21],	a
+ENDM
+
+CH2_ENV:	MACRO
+	ld	a,	(\1*16) | (\2*8) | \3
+	ld	[rNR22],	a
+ENDM
+
+CH2_PLAY:	MACRO
+GB_FREQ		EQU	(2048.0 - DIV(131072.0, \1))>>16
+
+	ld	a,	$FF & GB_FREQ
+	ld	[rNR23],	a
+	ld	a,	(GB_FREQ >> 8) | (\2 * 64) | %10000000
+	ld	[rNR24],	a
+
+PURGE	GB_FREQ
+ENDM
+
+
+
+;****************************
+;*         CHANNEL 3        *
+;****************************
+
+CH3_ON:		MACRO
+	ld	a,			\1*128
+	ld	[rNR30],	a
+ENDM
+
+CH3_LEN:	MACRO
+	ld	a,			\1
+	ld	[rNR31],	a
+ENDM
+
+CH3_MODE:	MACRO
+	ld		a,			\1*32
+	ld		[rNR32],	a
+ENDM
+
+CH3_PLAY:	MACRO
+GB_FREQ		EQU	(2048.0 - DIV(131072.0, \1))>>16
+
+	ld	a,	$FF & GB_FREQ
+	ld	[rNR33],	a
+	ld	a,			(GB_FREQ >> 8) | (\2 * 64) | %10000000
+	ld	[rNR34],	a
+
+PURGE	GB_FREQ
+ENDM
+
 
 ;****************************
 ;*        NOTES FREQS       *
