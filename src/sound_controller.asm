@@ -2,6 +2,11 @@ IF  !DEF(__SOUND_CONTROLLER_DEF__)
 __SOUND_CONTROLLER_DEF__ SET 1
 
 
+				RSRESET
+s_note_on		RB 1
+s_note_freq		RB 2
+s_note_SIZEOF	RB 0
+
 SECTION "sound_controller_vars", BSS
 
 v_sc_time_unit:		DS 1
@@ -24,11 +29,39 @@ ANGLE	SET		ANGLE+4096.0
 PURGE	ANGLE, DATA1, DATA2
 wave_end:
 
+WRITE_NOTE:	MACRO
+NOTE_FREQ EQU (2048.0 - DIV(131072.0, \1))>>16
+
+DB 1
+DB $FF & NOTE_FREQ
+DB NOTE_FREQ >> 8
+
+PURGE NOTE_FREQ
+ENDM
+
+bass_line:
+	WRITE_NOTE NOTE_E1
+	DB 0, $00, $00
+	WRITE_NOTE NOTE_E1
+	WRITE_NOTE NOTE_E1
+	WRITE_NOTE NOTE_E1
+	DB 0, $00, $00
+	WRITE_NOTE NOTE_E1
+	WRITE_NOTE NOTE_E1
+	WRITE_NOTE NOTE_E1
+	DB 0, $00, $00
+	WRITE_NOTE NOTE_E1
+	WRITE_NOTE NOTE_E1
+	WRITE_NOTE NOTE_E1
+	DB 0, $00, $00
+	WRITE_NOTE NOTE_E1
+	WRITE_NOTE NOTE_E1
+
 
 SECTION "sound_controller", CODE
 
 sound_controller_init:
-	ld	a,	10
+	ld	a,	6
 	ld	[v_sc_time_unit],		a
 	ld	a,	0
 	ld	[v_sc_time_counter],	a
@@ -49,9 +82,46 @@ sound_controller_update:
 	ld	a,	0
 	ld	[v_sc_time_counter],	a
 	
-	; LA MUSIQUE
+	ld	hl,	bass_line
+	ld	b,	0
+	ld	c,	s_note_SIZEOF
+	ld	a,	[v_sc_current_time]
+.loop:
+	cp	0
+	jr	z,	.found
+	dec	a
+	add hl,	bc
+	jr .loop
+.found:
+
+	ld	a,	[hl]
+	cp	0
+	jr	z,	.play_end
+
+	CH2_LEN		WAVEP_3_4,	20
+	CH2_ENV		8, 0, 1
+	inc hl
+	ld	a,	[hl]
+	ld	[rNR23],	a
+	inc	hl
+	ld	a,	[hl]
+	or	%11000000
+	ld	[rNR24],	a
+
+	
+.play_end:
+	ld	a, [v_sc_current_time]
+	inc	a
+	cp	16
+	jr	nz,	.end
+	ld	a,	0
+.end:
+	ld	[v_sc_current_time],	a
 	
 	ret
+
+sound_controller
+
 
 sound_shoot:
 	CH1_SWEEP	1, 1, 5
