@@ -79,7 +79,7 @@ CH3_ON:		MACRO
 ENDM
 
 CH3_LEN:	MACRO
-	ld	a,			\1
+	ld	a,			255 - \1
 	ld	[rNR31],	a
 ENDM
 

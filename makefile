@@ -50,7 +50,7 @@ fclean: clean
 re : fclean all
 
 upload: $(BIN_DIR)$(TARGET)
-	sudo ~/ems-flasher/ems-flasher --bank 2 --write $(BIN_DIR)$(TARGET)
+	sudo ~/ems-flasher/ems-flasher --bank 1 --write $(BIN_DIR)$(TARGET)
 
 $(BIN_DIR):
 	@mkdir -p $@
