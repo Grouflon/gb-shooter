@@ -110,8 +110,8 @@ player_enemy_collision:
 
 	dec		hl
 	dec		hl
-	call	enemy_reset
-	call	player_reset
+	call	enemy_hit
+	call	player_hit
 
 	ret
 	

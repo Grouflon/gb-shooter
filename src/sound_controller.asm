@@ -171,6 +171,12 @@ sound_hit:
 	CH4_PLAY 1
 	ret
 
+sound_destroy:
+	CH4_ENV	12, 0, 3
+	CH4_MODE %1010101
+	CH4_PLAY 0
+	ret
+
 sound_test:
 	CH3_ON		1
 	CH3_MODE	WAVEMODE_SHIFT1

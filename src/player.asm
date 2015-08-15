@@ -35,6 +35,12 @@ player_reset:
 	ret
 
 
+player_hit:
+	call sound_destroy
+	call player_reset
+	ret
+
+
 player_draw:
 	ld	hl,	OAM_PLAYER
 
