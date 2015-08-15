@@ -1,14 +1,41 @@
 IF  !DEF(__SOUND_CONTROLLER_DEF__)
 __SOUND_CONTROLLER_DEF__ SET 1
 
+MUSIC_TIME_UNIT	EQU 8
 
 				RSRESET
 s_note_on		RB 1
-s_note_freq		RB 2
+s_note_chan		RB 2
+s_note_r0		RB 1
+s_note_r1		RB 1
+s_note_r2		RB 1
+s_note_freqlo	RB 1
+s_note_freqhi	RB 1
 s_note_SIZEOF	RB 0
 
-MUSIC_TIME_UNIT	EQU 8
+; \1 - Note Frequency
+; \2 - Sweep
+; \3 - Length
+; \4 - Envelope
+; \5 - counter on
+CH1_NOTE: MACRO
+GB_FREQ		EQU	(2048.0 - DIV(131072.0, \1))>>16
+IF \5 == 1
+	COUNTER	EQU %01000000
+ELSE
+	COUNTER	EQU 0
+ENDC
 
+	DB		1
+	DW		rNR10
+	DB		\2
+	DB		\3
+	DB		\4
+	DB		$FF & GB_FREQ
+	DB		(GB_FREQ >> 8) | %10000000 | COUNTER
+	
+PURGE	GB_FREQ, COUNTER
+ENDM
 
 WRITE_NOTE:	MACRO
 NOTE_FREQ EQU (2048.0 - DIV(131072.0, \1))>>16
