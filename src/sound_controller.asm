@@ -81,7 +81,6 @@ sound_controller_init:
 	ret
 	
 sound_controller_update:
-	ret
 	ld	a,	[v_sc_time_unit]
 	ld	b,	a
 	ld	a,	[v_sc_time_counter]
