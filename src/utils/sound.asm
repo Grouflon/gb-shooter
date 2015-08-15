@@ -22,7 +22,7 @@ CH1_SWEEP:	MACRO
 ENDM
 
 CH1_LEN:	MACRO
-	ld	a,	(\1*64) | -(\2-63)
+	ld	a,	(\1*64) | 63-\2
 	ld	[rNR11],	a
 ENDM
 
@@ -47,7 +47,7 @@ ENDM
 ;****************************
 
 CH2_LEN:	MACRO
-	ld	a,	(\1*64) | -(\2-63)
+	ld	a,	(\1*64) | 63-\2
 	ld	[rNR21],	a
 ENDM
 
@@ -99,6 +99,30 @@ GB_FREQ		EQU	(2048.0 - DIV(131072.0, \1))>>16
 PURGE	GB_FREQ
 ENDM
 
+
+;****************************
+;*         CHANNEL 4        *
+;****************************
+
+CH4_LEN:	MACRO
+	ld	a,	(63-\1)
+	ld	[rNR41],	a
+ENDM
+
+CH4_ENV:	MACRO
+	ld	a,	(\1*16) | (\2*8) | \3
+	ld	[rNR42],	a
+ENDM
+
+CH4_MODE:	MACRO
+	ld	a,			\1
+	ld	[rNR42_2],	a
+ENDM
+
+CH4_PLAY:	MACRO
+	ld	a,	%10000000 | \1<<6
+	ld	[rNR43],	a
+ENDM
 
 ;****************************
 ;*        NOTES FREQS       *

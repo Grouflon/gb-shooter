@@ -63,7 +63,7 @@ bullet_enemy_collision:
 
 	dec		hl
 	dec		hl
-	call 	enemy_reset
+	call 	enemy_hit
 	dec		bc
 	dec		bc
 	push	bc

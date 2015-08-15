@@ -81,6 +81,7 @@ sound_controller_init:
 	ret
 	
 sound_controller_update:
+	ret
 	ld	a,	[v_sc_time_unit]
 	ld	b,	a
 	ld	a,	[v_sc_time_counter]
@@ -164,6 +165,13 @@ sound_shoot:
 	CH1_PLAY	NOTE_E5, 0
 	ret
 
+sound_hit:
+	CH4_LEN 15
+	CH4_ENV	10, 0, 1
+	CH4_MODE %1010101
+	CH4_PLAY 1
+	ret
+
 sound_test:
 	CH3_ON		1
 	CH3_MODE	WAVEMODE_SHIFT1
@@ -184,7 +192,7 @@ sound_init:
 	ld	a,			%01110111
 	ld	[rNR50],	a
 	; init outputs
-	ld	a,			%01110111
+	ld	a,			%11111111
 	ld	[rNR51],	a
 
 	ret

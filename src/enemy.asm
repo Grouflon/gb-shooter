@@ -234,6 +234,13 @@ ENDM
 
 
 ; hl	- strcut address
+enemy_hit:
+	call enemy_reset
+	call sound_hit
+	ret
+
+
+; hl	- strcut address
 enemy_reset:
 	ld	a,		0
 	ldi	[hl],	a
