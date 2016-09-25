@@ -1,7 +1,11 @@
 IF  !DEF(__SOUND_CONTROLLER_DEF__)
 __SOUND_CONTROLLER_DEF__ SET 1
 
-MUSIC_TIME_UNIT	EQU 8
+PATTERN_HEADER_SIZE	EQU 1
+PATTERN_UNIT_SIZE	EQU 2
+SEQUENCE_UNIT_SIZE	EQU 2
+
+MUSIC_TIME_UNIT	EQU 6
 
 				RSRESET
 s_note_on		RB 1
@@ -65,24 +69,24 @@ INCLUDE "data/music.asm"
 
 SECTION "sound_controller_vars", BSS
 
-v_sc_time_unit:		DS 1
-v_sc_time_counter:	DS 1
-v_sc_current_time:	DS 1
+v_sc_time_counter:			DS 1
+v_sc_current_pattern:		DS 1
+v_sc_current_pattern_loop:	DS 1
+v_sc_current_pattern_time:	DS 1
 
 
 SECTION "sound_controller", CODE
 
 sound_controller_init:
-	ld	a,	MUSIC_TIME_UNIT
-	ld	[v_sc_time_unit],		a
 	ld	a,	0
 	ld	[v_sc_time_counter],	a
-	ld	[v_sc_current_time],	a
+	ld	[v_sc_current_pattern],	a
+	ld	[v_sc_current_pattern_loop],	a
+	ld	[v_sc_current_pattern_time],	a
 	ret
 	
 sound_controller_update:
-	ld	a,	[v_sc_time_unit]
-	ld	b,	a
+	ld	b,	MUSIC_TIME_UNIT
 	ld	a,	[v_sc_time_counter]
 	cp	b
 	jr	z,	.play
@@ -96,8 +100,8 @@ sound_controller_update:
 	
 	ld	hl,	0
 	ld	b,	0
-	ld	c,	s_note_SIZEOF
-	ld	a,	[v_sc_current_time]
+	ld	c,	PATTERN_UNIT_SIZE
+	ld	a,	[v_sc_current_pattern_time]
 .loop:
 	cp	0
 	jr	z,	.found
@@ -108,49 +112,46 @@ sound_controller_update:
 	push hl
 	pop	 bc
 
-; Bass
-	ld	hl,	bass
-	add	hl,	bc
-	ld	a,	[hl]
-	cp	0
-	jr	z,	.play_lead
-	CH2_LEN		WAVEP_3_4,	20
-	CH2_ENV		8, 0, 1
+.channel1
+	ld	hl, patterns_start + PATTERN_HEADER_SIZE
+	add hl, bc
 	inc hl
-	ld	a,	[hl]
-	ld	[rNR23],	a
-	inc	hl
-	ld	a,	[hl]
-	or	%11000000
-	ld	[rNR24],	a
+	ld	a, [hl]
+	cp	0
+	jr	z, .channel2
 
-; Lead
-.play_lead:
-	ld	hl,	lead
-	add	hl,	bc
-	ld	a,	[hl]
+	dec	hl
+	push bc
+	ld	de,	rNR13
+	ld	bc, PATTERN_UNIT_SIZE
+	call mem_copy
+	pop bc
+
+.channel2
+	ld	hl, patterns_start + PATTERN_HEADER_SIZE
+	ld	de, (16 * PATTERN_UNIT_SIZE)
+	add hl, de
+	add hl, bc
+	inc hl
+	ld	a, [hl]
 	cp	0
 	jr	z, .play_end
-	CH3_ON		1
-	CH3_LEN		50
-	CH3_MODE	WAVEMODE_SHIFT2
-	inc hl
-	ld	a,	[hl]
-	ld	[rNR33],	a
-	inc	hl
-	ld	a,	[hl]
-	or	%11000000
-	ld	[rNR34],	a
 
-	
+	dec	hl
+	push bc
+	ld	de,	rNR23
+	ld	bc, PATTERN_UNIT_SIZE
+	call mem_copy
+	pop bc
+
 .play_end:
-	ld	a, [v_sc_current_time]
+	ld	a, [v_sc_current_pattern_time]
 	inc	a
-	cp	64
+	cp	16
 	jr	nz,	.end
 	ld	a,	0
 .end:
-	ld	[v_sc_current_time],	a
+	ld	[v_sc_current_pattern_time],	a
 	
 	ret
 
@@ -158,13 +159,15 @@ sound_controller
 
 
 sound_shoot:
+	ret
 	CH1_SWEEP	1, 1, 5
 	CH1_LEN		WAVEP_1_8,	63
 	CH1_ENV		15, 0, 1
-	CH1_PLAY	NOTE_E5, 0
+	CH1_PLAY	FREQ_E5, 0
 	ret
 
 sound_hit:
+	ret
 	CH4_LEN 15
 	CH4_ENV	10, 0, 1
 	CH4_MODE %1010101
@@ -172,15 +175,17 @@ sound_hit:
 	ret
 
 sound_destroy:
+	ret
 	CH4_ENV	12, 0, 3
 	CH4_MODE %1010101
 	CH4_PLAY 0
 	ret
 
 sound_test:
+	ret
 	CH3_ON		1
 	CH3_MODE	WAVEMODE_SHIFT1
-	CH3_PLAY	NOTE_A6, 0
+	CH3_PLAY	FREQ_A6, 0
 	ret
 
 sound_init:
@@ -189,6 +194,13 @@ sound_init:
 	ld	bc,	wave_end - wave
 	ld	hl,	wave
 	call mem_copy
+
+	CH1_SWEEP	0, 0, 0
+	CH1_LEN		WAVEP_1_2,	63
+	CH1_ENV		15, 0, 1
+
+	CH2_LEN		WAVEP_3_4,	20
+	CH2_ENV		8, 0, 1
 
 	; enable sound system
 	ld	a,			%10000000
